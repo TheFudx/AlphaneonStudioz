@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Series Banners</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .banner-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 20px; }
+        .banner-card { width: 300px; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+        .banner-card img { width: 100%; height: 180px; object-fit: cover; }
+        .banner-details { padding: 15px; background: white; text-align: center; }
+        .banner-details h5 { margin: 0; font-size: 18px; }
+        .banner-details p { font-size: 14px; color: #666; margin-top: 5px; }
+        #errorMessage { color: red; text-align: center; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 class="text-center mt-4">Series Banners</h2>
+        <div id="errorMessage"></div>
+        <div id="seriesList" class="banner-container"></div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            fetch("https://alphastudioz.in/public/flutter-app/user/series_banner-test.php")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success" && data.data.length > 0) {
+                        let seriesList = $("#seriesList");
+                        seriesList.empty(); // Clear any existing content
+    
+                        data.data.forEach(series => {
+                            let bannerHtml = `
+                                <div class="banner-card">
+                                    <img src="${series.landscape_image_url}" alt="${series.name}">
+                                    <div class="banner-details">
+                                        <h5>${series.name}</h5>
+                                        <p>${series.description.substring(0, 80)}...</p>
+                                    </div>
+                                </div>
+                            `;
+                            seriesList.append(bannerHtml);
+                        });
+                    } else {
+                        $("#seriesList").html("<p class='text-center'>No series found.</p>");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching data:", error);
+                    $("#seriesList").html("<p class='text-center text-danger'>Failed to load series. Try again later.</p>");
+                });
+        });
+    </script>
+    
+
+</body>
+</html>
