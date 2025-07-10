@@ -58,7 +58,7 @@
                         </ul>
                     </div>
                     <div class="paragraph apps-section"> <p class="pb-2">All Rights Reserved @2025 - Alphastudioz</p>
-                        <h5 class="text-white mt-2">GET THE APPS</h5>
+                        <h5 class="text-white mt-2">GET THE APPS</h5> 
                         
                         <img src="{{ url('/') }}/asset/images/alphaApp.jpg" height="100px" width="100px"
                             class="appStorePlaystore" style="border: 2px solid #FFFFFF; padding:2px" alt="QR Code">
