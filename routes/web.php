@@ -127,7 +127,7 @@ Route::post('auth/update-password',[ForgotPasswordController::class,'updatePassw
 // Auth middleware routes;
 Route::group(['middleware' => ['mobile_auth', 'device.limit','auth']], function () {
     // for detail page of podcast, trailer, etc.
-    Route::get('/view/details/{id}/watch=true', [ViewDetailsController::class, 'index'])->name('view.details');
+    Route::get('/view/details/{id}', [ViewDetailsController::class, 'index'])->name('view.details');
     //Podcasts
     Route::get('/podcasts/list', [PodcastsController::class, 'podcastsList'])->name('podcasts.list');
     //Trailer
@@ -135,7 +135,7 @@ Route::group(['middleware' => ['mobile_auth', 'device.limit','auth']], function 
     //Webseries
     Route::get('/webseries/list', [WebSeriesController::class, 'webseriesList'])->name('webseries.list');
     Route::get('/webseries/view/{id}', [WebSeriesController::class, 'index'])->name('webseries.view'); // Encrypt ID before passing it to the route
-    Route::get('/webseries/episode/view/{id}/watch=true',[WebSeriesController::class, 'webseriesEpisodeView'])->name('webseries.episodes.view'); // Encrypt ID before passing it to the route
+    Route::get('/webseries/episode/view/{id}',[WebSeriesController::class, 'webseriesEpisodeView'])->name('webseries.episodes.view'); // Encrypt ID before passing it to the route
     //Sports
     Route::get('/sports/list', [comingsoonController::class, 'coming']);
     //music
@@ -155,8 +155,8 @@ Route::group(['middleware' => ['mobile_auth', 'device.limit','auth']], function 
     Route::put('/profile/update', [ProfileController::class, 'update']);
     Route::delete('/profile/delete', [ProfileController::class, 'deleteAccount']);
     //Khlups
-    Route::get('/khlups/view/{tokengen}/watch=true', [KhlupsController::class, 'index'])->name('khlups.view');
-    Route::get('/user/khlups/view/{tokengen}/watch=true', [KhlupsController::class, 'viewUsersKhlups'])->name('user.khlups.view');
+    Route::get('/khlups/view/{tokengen}', [KhlupsController::class, 'index'])->name('khlups.view');
+    Route::get('/user/khlups/view/{tokengen}', [KhlupsController::class, 'viewUsersKhlups'])->name('user.khlups.view');
     Route::post('/khlup-save',[KhlupsController::class,'saveKhlup'])->name('kluph.save');
     Route::post('/khlup-delete',[KhlupsController::class,'deleteKhlup'])->name('kluph.delete');
     Route::post('/khlup-update/{id}',[KhlupsController::class,'updateKhlup'])->name('kluph.update');

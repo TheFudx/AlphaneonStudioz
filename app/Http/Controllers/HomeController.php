@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
+use App\Models\App_Section;
 use App\Models\Video;
 use App\Models\Banner;
 use App\Models\Series;
@@ -90,6 +91,99 @@ class HomeController extends Controller
          'comdeyData' => $comdeyData,  'movies'=> $movies, 
          'shortfilms' => $shortfilms, 'series' => $webseries, 'khlup' => $khlups, 'banner' => $banner, 
          'watchlist' => $watchlist]);
+    }
+
+    public function indexAppSection()
+    {
+        // Eager load required video data once
+        $commonVideoQuery = Video::active()
+            ->select('video.*', 'language.name as language_name')
+            ->join('language', 'language.id', '=', 'video.language_id')
+            ->orderBy('video.created_at', 'desc')
+            ->get();
+
+        // Static, light queries
+        $banner = StaticBanners::orderBy('id', 'desc')->limit(4)->get();
+        $webseries = Series::all();
+        $khlups = Kluphs::where('type_id', config('constant.TYPES.KHLUP'))->where('user_id', 1)->orderBy('id', 'desc')->get();
+
+        $watchlist = app('wishlist');
+        session(['watchlist' => $watchlist]);
+
+        // Fetch app section and group video IDs by type
+        $typeWiseVideos = [];
+        foreach (App_Section::get() as $a) {
+            $type_id = $a['type_id'];
+            $video_ids = array_map('intval', explode(',', $a['video_id']));
+            $typeWiseVideos[$type_id] = array_unique(array_merge($typeWiseVideos[$type_id] ?? [], $video_ids));
+        }
+
+        // Predefine your targets
+        $videosByType = [
+            'movies'      => config('constant.TYPES.MOVIES'),
+            'trailer'     => config('constant.TYPES.TRAILER'),
+            'shortfilms'  => config('constant.TYPES.SHORTFILMS'),
+            'music'       => config('constant.TYPES.MUSIC'),
+            'comdeyData'  => config('constant.TYPES.COMEDYSHOW'),
+            'poadcastData'=> config('constant.TYPES.PODCAST'),
+            'upcomming'   => config('constant.TYPES.UPCOMING'),
+        ];
+
+        // Filter videos once
+        $videoCollections = [];
+
+        foreach ($videosByType as $var => $typeId) {
+            $videoIds = $typeWiseVideos[$typeId] ?? [];
+            $videoCollections[$var] = $commonVideoQuery->filter(function ($video) use ($videoIds, $typeId) {
+                return in_array($video->id, $videoIds)
+                    && $video->type_id == $typeId
+                    && $video->status == 1;
+            });
+        }
+
+        // Handle category-based filtering (single loop)
+        $romance = $action = $thrill = collect();
+
+        foreach ($commonVideoQuery as $video) {
+            if ($video->type_id == config('constant.TYPES.MOVIES') && $video->status == 1) {
+                $categories = explode(',', $video->category_id);
+                if (in_array(12, $categories)) $romance->push($video);
+                if (in_array(13, $categories)) $action->push($video);
+                if (in_array(14, $categories)) $thrill->push($video);
+            }
+        }
+
+        // Limit them
+        $romance = $romance->take(12);
+        $action  = $action->take(12);
+        $thrill  = $thrill->take(12);
+
+        // Special Banner Videos
+        $videos = Banner::join('video', 'video.id', '=', 'banner.video_id')
+            ->join('type', 'type.id', '=', 'banner.type_id')
+            ->where('banner.type_id', config('constant.TYPES.MOVIES'))
+            ->where('banner.is_home_screen', 1)
+            ->orderByDesc('banner.created_at')->limit(12)
+            ->get(['banner.id as bid', 'video.id', 'video.name', 'release_date', 'landscape_url', 'video_duration', 'type.name as tname', 'description']);
+
+        // Return response
+        return view('index', [
+            'videos'        => $videos,
+            'trailer'       => $videoCollections['trailer'],
+            'upcomming'     => $videoCollections['upcomming'],
+            'romance'       => $romance,
+            'action'        => $action,
+            'thrill'        => $thrill,
+            'music'         => $videoCollections['music'],
+            'poadcastData'  => $videoCollections['poadcastData'],
+            'comdeyData'    => $videoCollections['comdeyData'],
+            'movies'        => $videoCollections['movies'],
+            'shortfilms'    => $videoCollections['shortfilms'],
+            'series'        => $webseries,
+            'khlup'         => $khlups,
+            'banner'        => $banner,
+            'watchlist'     => $watchlist,
+        ]);
     }
 
     public function privacypolicy(){

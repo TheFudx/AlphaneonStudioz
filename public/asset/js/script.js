@@ -617,19 +617,19 @@ $(document).ready(function () {
         var url = '';
         switch (type) {
             case 6:
-                url = '/view/details/' + id + '/watch=true';
+                url = '/view/details/' + id;
                 break;
             case 10:
-                url = '/webseries/episode/view/' + id + '/watch=true';
+                url = '/webseries/episode/view/' + id;
                 break;
             case 8:
-                url = '/view/details/' + id + '/watch=true';
+                url = '/view/details/' + id;
                 break;
             case 5:
-                url = '/view/details/' + id + '/watch=true';
+                url = '/view/details/' + id;
                 break;
             case 11:
-                url = '/view/details/' + id + '/watch=true';
+                url = '/view/details/' + id;
                 break;
             default:
                 break;
@@ -911,33 +911,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 //DRM Management
-document.addEventListener('contextmenu', event => event.preventDefault());
+// document.addEventListener('contextmenu', event => event.preventDefault());
 
-document.addEventListener('keydown', function (e) {
-    // Prevent PrintScreen
-    if (e.key === 'PrintScreen') {
-        navigator.clipboard.writeText('');
-        alert('Screenshot is disabled!');
-    }
+// document.addEventListener('keydown', function (e) {
+//     // Prevent PrintScreen
+//     if (e.key === 'PrintScreen') {
+//         navigator.clipboard.writeText('');
+//         alert('Screenshot is disabled!');
+//     }
 
-    // Prevent Ctrl+P (print)
-    if (e.ctrlKey && e.key === 'p') {
-        e.preventDefault();
-        alert('Printing is disabled!');
-    }
-});
-document.addEventListener("contextmenu", e => e.preventDefault());
-document.addEventListener("keydown", e => {
-    if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
-        e.preventDefault();
-    }
-});
+//     // Prevent Ctrl+P (print)
+//     if (e.ctrlKey && e.key === 'p') {
+//         e.preventDefault();
+//         alert('Printing is disabled!');
+//     }
+// });
+// document.addEventListener("contextmenu", e => e.preventDefault());
+// document.addEventListener("keydown", e => {
+//     if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+//         e.preventDefault();
+//     }
+// });
 
-document.addEventListener('visibilitychange', function () {
-    if (document.hidden) {
-        console.warn('User switched tabs or minimized, potentially for screen recording.');
-    }
-});
+// document.addEventListener('visibilitychange', function () {
+//     if (document.hidden) {
+//         console.warn('User switched tabs or minimized, potentially for screen recording.');
+//     }
+// });
 
 
 // Hover on image

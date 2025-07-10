@@ -1,7 +1,68 @@
 @php
     $category = app('category');
 @endphp
+<style>
+    /* Add or update your CSS */
+    .app-links-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-top: -70px;
+        height: auto;
+    }
 
+    .store-links {
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .store-icon {
+        height: 40px;
+        width: 40px;
+        object-fit: contain;
+    }
+
+    .app-icon {
+        height: 70px;
+        width: 70px;
+        border-radius: 20%;
+        border: 2px solid #fff;
+        padding: 4px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .app-icon:hover {
+        transform: scale(1.05);
+        /* Optional hover effect */
+    }
+
+    @media (max-width: 576px) {
+
+        .store-icon,
+        .app-icon {
+            height: 45px;
+            width: 45px;
+        }
+    }
+
+    .appStorePlaystore {
+        border-radius: 18% !important;
+        vertical-align: middle;
+    }
+
+    /* You might want to adjust the original li styles if they conflict */
+    /* For example, if you want your app store links to be separate from quick links */
+    footer .footer-section .footer-section-container .quick-links-container ul li {
+        /* Existing styles */
+        display: inline-block;
+        margin: 0px 20px;
+        font-family: Rubic-Regular;
+    }
+
+    /* Remove the margin-left (ms-2) from the original HTML as it's not needed with flexbox spacing */
+    /* .ms-2 in the original snippet could be replaced by margin: 0 10px on the anchor tags directly. */
+</style>
 <div class="modal fade" id="mood-modal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -47,37 +108,40 @@
                 <div class="logo-container">
                     <img src="{{ url('/') }}/asset/images/logo.png" alt="">
                 </div>
-                <div class="footer-content-wrapper"> <div class="quick-links-container pb-3">
-                        <ul>
-                            <li><a href="{{ route('home') }}">Home</a></li>
-                            <li><a href="{{ route('contact-us') }}">Contact</a></li>
-                            <li><a href="{{ route('aboutus') }}">About</a></li>
-                            <li><a href="{{ route('footer.privacy') }}">Privacy & Policy</a></li>
-                            <li><a href="{{ route('footer.refund') }}">Refund Policy</a></li>
-                            <li><a href="{{ route('footer.terms&co') }}">Terms & Conditions</a></li>
-                        </ul>
-                    </div>
-                    <div class="paragraph apps-section"> <p class="pb-2">All Rights Reserved @2025 - Alphastudioz</p>
-                        <h5 class="text-white mt-2">GET THE APPS</h5> 
-                        
-                        <img src="{{ url('/') }}/asset/images/alphaApp.jpg" height="100px" width="100px"
-                            class="appStorePlaystore" style="border: 2px solid #FFFFFF; padding:2px" alt="QR Code">
+                <div class="quick-links-container pb-3">
+                    <ul>
+                        <li><a href="{{ route('home') }}">Home</a></li>
+                        <li><a href="{{ route('contact-us') }}">Contact</a></li>
+                        <li><a href="{{ route('aboutus') }}">About</a></li>
+                        <li><a href="{{ route('footer.privacy') }}">Privacy & Policy</a></li>
+                        <li><a href="{{ route('footer.refund') }}">Refund Policy</a></li>
+                        <li><a href="{{ route('footer.terms&co') }}">Terms & Conditions</a></li>
+                    </ul>
+                </div>
 
-                        <ul class="list-unstyled mt-3 d-flex justify-content-center align-items-center gap-3">
-                            <li>
-                                <a href="https://play.google.com/store/apps/details?id=com.alphastudioz.alphaneonstudioz"
-                                    target="_blank">
-                                    <img src="{{ url('/') }}/asset/images/play-store.png" height="30px"
-                                        width="30px" alt="Play Store">
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://apps.apple.com/app/id6723896639" target="_blank">
-                                    <img src="{{ url('/') }}/asset/images/app-store.png" height="30px" width="30px"
-                                        alt="App Store">
-                                </a>
-                            </li>
-                        </ul>
+                <div class="paragraph col-6 m-auto">
+                    <p>All Rights Reserved @2025 - Alphastudioz</p>
+                </div>
+                <div class="app-links-container mb-3">
+                    <p class="text-white mb-2">Download our App</p>
+                    <div class="store-links d-flex align-items-center gap-3 flex-wrap">
+                          <!-- App Icon -->
+                        <img src="{{ url('/') }}/asset/icons/alphaApp.jpg" class="app-icon"
+                            alt="Alphastudioz App Icon">
+                        <!-- Google Play -->
+                        <a href="https://play.google.com/store/apps/details?id=com.alphastudioz.alphaneonstudioz"
+                            target="_blank">
+                            <img src="{{ url('/') }}/asset/icons/play-store.png" class="store-icon"
+                                alt="Google Play Store">
+                        </a>
+
+                        <!-- Apple Store -->
+                        <a href="https://apps.apple.com/app/id6723896639" target="_blank">
+                            <img src="{{ url('/') }}/asset/icons/app-store.png" class="store-icon"
+                                alt="Apple App Store">
+                        </a>
+
+                      
                     </div>
                 </div>
                 <div class="block-des">

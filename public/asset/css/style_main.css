@@ -31,9 +31,6 @@ body {
 }
 main {
   overflow-x: hidden;
-   /* min-height: 100%;
-      display: flex;
-      flex-direction: column; */
 }
 hr {
             color: #b9a8a6
@@ -645,10 +642,12 @@ background: rgba(0, 0, 0, 0.3); /* Adjust disabled background */
 
 .owl-carousel .owl-nav.disabled .owl-prev {
   left: -30px; /* Adjust as needed to bring button beside the slider */
+  height: 150px;
 }
 
 .owl-carousel .owl-nav.disabled .owl-next {
   right: -35px; /* Adjust as needed to bring button beside the slider */
+  height: 150px;
 }
 .owl-carousel .owl-nav.disabled .owl-prev span,
 .owl-carousel .owl-nav.disabled .owl-next span{
@@ -2125,7 +2124,6 @@ background: rgba(0, 0, 0, 0.3); /* Adjust disabled background */
 }
 footer {
   margin-top: 90px;
-  margin-bottom:0px;
 }
 footer .footer-section {
   background-color: #262626;
@@ -2133,62 +2131,6 @@ footer .footer-section {
 footer .footer-section .footer-section-container {
   text-align: center;
 }
-/* ---------------------------------- */
-.footer-content-wrapper {
-    display: flex;
-    justify-content: space-between; /* Distributes items with space between them */
-    align-items: flex-start; /* Aligns items to the start of the cross axis (top) */
-    flex-wrap: wrap; /* Allows items to wrap to the next line on smaller screens */
-    width: 100%; /* Ensure it takes full width */
-}
-
-.quick-links-container {
-    flex: 1; /* Allows this section to grow and shrink */
-    min-width: 250px; /* Minimum width before wrapping, adjust as needed */
-    text-align: left; /* Align links to the left */
-}
-
-.apps-section {
-    flex: 1; /* Allows this section to grow and shrink */
-    min-width: 200px; /* Minimum width before wrapping, adjust as needed */
-    text-align: right; /* Align scanner and app icons to the right */
-    display: flex;
-    flex-direction: column; /* Stack content vertically */
-    align-items: flex-end; /* Align items to the right within the column */
-}
-
-/* Adjust styles for the "GET THE APPS" text and QR code/app icons specifically */
-.apps-section h5,
-.apps-section .appStorePlaystore,
-.apps-section .list-unstyled {
-    margin-left: auto; /* Push them to the right */
-    margin-right: 0;
-}
-
-.apps-section .list-unstyled {
-    justify-content: flex-end; /* Align app icons to the right within their flex container */
-}
-@media (max-width: 768px) {
-    .footer-content-wrapper {
-        flex-direction: column; /* Stack sections vertically on small screens */
-        align-items: center; /* Center items when stacked */
-    }
-
-    .quick-links-container,
-    .apps-section {
-        text-align: center; /* Center content on smaller screens */
-        align-items: center; /* Center items within their columns */
-        margin-bottom: 20px; /* Add some space between stacked sections */
-    }
-
-    .apps-section h5,
-    .apps-section .appStorePlaystore,
-    .apps-section .list-unstyled {
-        margin-left: auto;
-        margin-right: auto; /* Center them on smaller screens */
-    }
-}
-/* ---------------------------------- */
 footer .footer-section .footer-section-container .logo-container img {
   width: 150px;
 }
