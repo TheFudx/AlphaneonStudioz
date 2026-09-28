@@ -6,8 +6,6 @@ use App\Models\Notification;
 class TvShowController extends Controller
 {
     public function index(){
-        
-        
         return view('tvshows-list', [ ]);
     }
 }

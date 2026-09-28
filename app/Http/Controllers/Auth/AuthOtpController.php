@@ -109,7 +109,7 @@ class AuthOtpController extends Controller
             ]);
   
             Auth::login($user);
-  
+            
             return redirect('/home');
         }
   

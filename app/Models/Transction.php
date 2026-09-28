@@ -17,6 +17,7 @@ class Transction extends Model
         'user_id' => 'integer',
         'unique_id' => 'string',
         'package_id' => 'integer',
+        'razorpay_subscription_id' => 'string',
         'description' => 'string',
         'amount' => 'string',
         'payment_id' => 'string',

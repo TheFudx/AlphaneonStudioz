@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Tv shows
+    {{ config('app.project_name') }} | Tv shows
 @endsection
 @section('main-section')
 <section id="innerBanners" class="">

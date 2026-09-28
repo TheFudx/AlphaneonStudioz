@@ -23,7 +23,7 @@ WHERE FIND_IN_SET(v.id, v.category_id)) as category_urls
 FROM video v
 INNER JOIN language l ON v.language_id = l.id
 WHERE FIND_IN_SET('$categoryId', v.category_id)
-        AND v.type_id = '$typeId'"; // Added table prefix for type_id
+        AND v.type_id = '$typeId' And v.status = 1"; // Added table prefix for type_id
 
 $result = mysqli_query($connectNow, $sql);
 

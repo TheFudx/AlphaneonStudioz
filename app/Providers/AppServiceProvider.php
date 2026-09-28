@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Services\DeviceService;
 use App\Models\Category;
 use App\Models\Notification;
+use App\Models\UserWatchLaterList;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use App\Helpers\VideoHelper; // Import your VideoHelper
@@ -32,16 +33,13 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('notification',function($app){
-            return Notification::orderBy('created_at', 'desc')->get();
+            return Notification::where('status',1)->orderBy('created_at', 'desc')->get();
         });
 
         $this->app->singleton('wishlist',function($app){
-            return session()->get('watchlist', []);
+            // return session()->get('watchlist', []);
+            return UserWatchLaterList::where('user_id', auth()->id())->get();
         });
-
-      
-
-        
     }
 
     /**
@@ -49,6 +47,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+         view()->composer('*', function ($view) {
+        $view->with('asset_version', time());
+    });
     //    $videoKey = env('VIDEO_ENCRYPTION_KEY');
 
     //     if ($videoKey) {

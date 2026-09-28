@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlphaStudioz | Checkout</title>
+    <title>{{ config('app.project_name') }} | Checkout</title>
 </head>
 <body>
     <h2>Proceed with Subscription Payment {{ $subscriptionId }}</h2>

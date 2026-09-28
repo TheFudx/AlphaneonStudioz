@@ -33,7 +33,7 @@ $sql = "SELECT
         INNER JOIN 
             language l ON v.language_id = l.id
         WHERE 
-            FIND_IN_SET('$categoryId', v.category_id) 
+            FIND_IN_SET('$categoryId', v.category_id)  AND v.status = 1
         ORDER BY 
             v.updated_at DESC";
 

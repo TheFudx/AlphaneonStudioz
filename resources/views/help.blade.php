@@ -1,6 +1,6 @@
 @extends('layouts.main') 
 @section('title')
-    Alphastudioz | Help
+    {{ config('app.project_name') }} | Help
 @endsection
 @section('main-section')
 <div class="row ms-0 me-0">
@@ -21,7 +21,7 @@
                             aria-expanded="true"
                             aria-controls="collapseOne"
                         >
-                            1. What is Alphaneon Studioz?
+                            1. What is {{ config('app.project_full_name') }}?
                         </button>
                     </h2>
                     <div
@@ -31,7 +31,7 @@
                         data-bs-parent="#accordionExample"
                     >
                         <div class="accordion-body">
-                            - Alphanneon Studioz is an online streaming platform
+                            - {{ config('app.project_full_name') }} is an online streaming platform
                             that offers a wide range of movies, TV shows, and
                             original content for subscribers to watch anytime,
                             anywhere.
@@ -48,7 +48,7 @@
                             aria-expanded="false"
                             aria-controls="collapseTwo"
                         >
-                            2. How does Alphaneon Studioz work?
+                            2. How does {{ config('app.project_full_name') }} work?
                         </button>
                     </h2>
                     <div
@@ -58,7 +58,7 @@
                         data-bs-parent="#accordionExample"
                     >
                         <div class="accordion-body">
-                            - To use Alphaneon Studioz, simply sign up for an
+                            - To use {{ config('app.project_full_name') }}, simply sign up for an
                             account and choose a subscription plan. Once subscribed,
                             you can access our content library through our website
                             or dedicated mobile apps on various devices.
@@ -75,7 +75,7 @@
                             aria-expanded="false"
                             aria-controls="collapseThree"
                         >
-                            3. What devices can I use to watch Alphaneon Studioz?
+                            3. What devices can I use to watch {{ config('app.project_full_name') }}?
                         </button>
                     </h2>
                     <div
@@ -85,7 +85,7 @@
                         data-bs-parent="#accordionExample"
                     >
                         <div class="accordion-body">
-                            - Alphaneon Studioz is available on a variety of devices
+                            - {{ config('app.project_full_name') }} is available on a variety of devices
                             including smartphones, tablets, smart TVs, streaming
                             media players, and gaming consoles. You can find our app
                             on major app stores or visit our website on supported
@@ -113,7 +113,7 @@
                         data-bs-parent="#accordionExample"
                     >
                         <div class="accordion-body">
-                            - Yes, many titles on Alphaneon Studioz are available
+                            - Yes, many titles on {{ config('app.project_full_name') }} are available
                             for offline viewing. Simply look for the download icon
                             next to the content you want to watch offline and
                             download it to your device.
@@ -186,7 +186,7 @@
                             aria-expanded="false"
                             aria-controls="collapseSeven"
                         >
-                            7. Is Alphaneon Studioz available in my country?
+                            7. Is {{ config('app.project_full_name') }} available in my country?
                         </button>
                     </h2>
                     <div
@@ -196,7 +196,7 @@
                         data-bs-parent="#accordionExample"
                     >
                         <div class="accordion-body">
-                            - Alphaneon Studioz is available in many countries
+                            - {{ config('app.project_full_name') }} is available in many countries
                             worldwide. To see if it's available in your country,
                             visit our website or contact our customer support team
                             for assistance.
@@ -278,7 +278,7 @@
                         <div class="accordion-body">
                             - If you have any questions or need assistance, you can
                             reach our customer support team through the contact form
-                            on our website or via email at info@alphastudioz.in.
+                            on our website or via email at {{ 'info@' . strtolower(config('app.project_name')) . '.in' }}.
                             We're here to help!
                         </div>
                     </div>

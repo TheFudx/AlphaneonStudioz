@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Kids
+    {{ config('app.project_name') }} | Kids
 @endsection
 <style>
     .owl-carousel .owl-nav.disabled {
@@ -64,11 +64,11 @@
                                         <div class="alpha-card skeleton card-for-kids">
                                             <div class="image-wrapper">
                                                 <a href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($videoItem->id)]) }}"> 
-                                                    <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$videoItem->landscape}}" alt="">
+                                                    <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$videoItem->landscape}}" alt="{{$videoItem->landscape}}" loading="lazy">
                                                 </a>
                                             </div>
                                             <div class="alpha-card-large {{ $videoItem->trailer_url ? 'movie-card' : '' }}" id="movie-card">
-                                                <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$videoItem->landscape}}" class="thumbnail" id="thumbnail" alt="">
+                                                <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$videoItem->landscape}}" class="thumbnail" id="thumbnail" alt="{{$videoItem->landscape}}">
                                                 <video class="video-holder" loop muted id="video-holder">
                                                     <source src="{{ $videoItem->trailer_url }}" type="video/mp4">
                                                 </video>
@@ -84,7 +84,8 @@
                                                             
                                                         </div>
                                                         <div class="col-3">
-                                                            @include('watchlist-button', ['id' => $videoItem->id, 'type' => 'video', 'watchlist' => $watchlist])
+                                                            @include('watchlist-button', ['id' => $videoItem->id, 
+                                                            'type_id' => $videoItem->type_id, 'category_id' => $videoItem->category_id, 'type' => 'video', 'watchlist' => $watchlist])
                                                         </div>
                                                         
                                                     </div>

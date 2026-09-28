@@ -1,5 +1,5 @@
 @php
-    $category = app('category');
+    $category = app('category')->where('status', 1);
 @endphp
 <style>
     /* Add or update your CSS */
@@ -8,6 +8,17 @@
         flex-direction: column;
         align-items: flex-end;
         margin-top: -70px;
+        margin-right: 20px;
+        height: auto;
+    }
+
+    .youtube-links-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        float: left;
+        margin-top: -70px;
+        margin-left: 20px;
         height: auto;
     }
 
@@ -20,6 +31,17 @@
         height: 40px;
         width: 40px;
         object-fit: contain;
+    }
+
+    .youtube-store-icon {
+        height: 80px;
+        width: 80px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .youtube-store-icon:hover {
+        transform: scale(1.05);
     }
 
     .app-icon {
@@ -38,11 +60,28 @@
     }
 
     @media (max-width: 576px) {
-
         .store-icon,
         .app-icon {
             height: 45px;
             width: 45px;
+        }
+
+        .youtube-store-icon {
+            height: 60px;
+            width: 60px;
+        }
+
+        .youtube-links-container {
+            float: none;
+            align-items: center;
+            margin-top: 10px;
+            margin-left: 0;
+        }
+
+        .app-links-container {
+            align-items: center;
+            margin-top: 15px;
+            margin-right: 0;
         }
     }
 
@@ -51,15 +90,228 @@
         vertical-align: middle;
     }
 
-    /* You might want to adjust the original li styles if they conflict */
-    /* For example, if you want your app store links to be separate from quick links */
+    footer .footer-section .footer-section-container .quick-links-container ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        margin: 0 auto;
+        list-style: none;
+        gap: 10px 24px;
+    }
+
     footer .footer-section .footer-section-container .quick-links-container ul li {
-        /* Existing styles */
-        display: inline-block;
-        margin: 0px 20px;
+        display: inline-flex;
+        margin: 0 !important;
         font-family: Rubic-Regular;
     }
 
+    footer .footer-section .footer-section-container .quick-links-container ul li a {
+        color: #ffffff;
+        font-size: 14px;
+        white-space: nowrap;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    footer .footer-section .footer-section-container .quick-links-container ul li a:hover {
+        color: #ff3a1f;
+    }
+
+    footer .footer-section .footer-section-container .quick-links-container ul li.quick-link-break {
+        display: none;
+        flex-basis: 100%;
+        width: 100%;
+        height: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    @media (max-width: 576px) {
+        footer .footer-section .footer-section-container .quick-links-container ul {
+            gap: 8px 14px;
+            padding: 0 10px;
+        }
+
+        footer .footer-section .footer-section-container .quick-links-container ul li.quick-link-break {
+            display: block;
+        }
+
+        footer .footer-section .footer-section-container .quick-links-container ul li a {
+            font-size: 12px;
+        }
+    }
+
+    @media (max-width: 390px) {
+        footer .footer-section .footer-section-container .quick-links-container ul {
+            gap: 6px 10px;
+            padding: 0 4px;
+        }
+
+        footer .footer-section .footer-section-container .quick-links-container ul li a {
+            font-size: 11px;
+        }
+    }
+
+    @media (max-width: 340px) {
+        footer .footer-section .footer-section-container .quick-links-container ul {
+            gap: 5px 6px;
+            padding: 0 2px;
+        }
+
+        footer .footer-section .footer-section-container .quick-links-container ul li a {
+            font-size: 10px;
+        }
+    }
+
+    .watch-youtube-btn {
+        transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .watch-youtube-btn:hover {
+        transform: scale(1.03);
+        opacity: 0.9;
+        color: #ffffff;
+    }
+
+    /* ============================================================
+   Mood Modal — base styles
+   ============================================================ */
+    .mood-modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .mood-modal-header {
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .mood-modal-header .modal-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin: 0;
+        text-align: center;
+    }
+
+    .mood-modal-body {
+        padding: 20px;
+        /* Smooth scrolling inside modal on mobile */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Card */
+    .mood-card {
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        border: none;
+        /* Fixed aspect ratio so all cards are equal height */
+        aspect-ratio: 3 / 4;
+    }
+
+    .mood-card:hover {
+        transform: scale(1.04);
+    }
+
+    .mood-card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .mood-card-overlay {
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 60%);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 8px;
+    }
+
+    .mood-card-text {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #fff;
+        margin: 0;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .mood-card-link {
+        text-decoration: none;
+        display: block;
+    }
+
+
+    /* ============================================================
+   Mobile small (max 576px)
+   ============================================================ */
+    /* @media (max-width: 576px) {
+
+  #mood-modal .modal-dialog {
+    margin: 0;
+    max-width: 100%;
+    height: 100%;
+  }
+
+  #mood-modal .modal-dialog-centered {
+    align-items: flex-end;
+  }
+
+  .mood-modal-content {
+    border-radius: 16px 16px 0 0;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #mood-modal .modal-dialog-scrollable .modal-body {
+    overflow-y: auto;
+  }
+
+  .mood-modal-header .modal-title {
+    font-size: 1.1rem;
+  }
+
+  .mood-modal-body {
+    padding: 12px;
+  }
+
+  .mood-card-text {
+    font-size: 0.75rem;
+  }
+} */
+
+
+    /* ============================================================
+   Tablet (577px – 768px)
+   ============================================================ */
+    /* @media (min-width: 577px) and (max-width: 768px) {
+  #mood-modal .modal-dialog {
+    max-width: 95%;
+    margin: auto;
+  }
+
+  .mood-modal-header .modal-title {
+    font-size: 1.2rem;
+  }
+
+  .mood-modal-body {
+    padding: 16px;
+  }
+
+  .mood-card-text {
+    font-size: 0.8rem;
+  }
+} */
     /* Remove the margin-left (ms-2) from the original HTML as it's not needed with flexbox spacing */
     /* .ms-2 in the original snippet could be replaced by margin: 0 10px on the anchor tags directly. */
 </style>
@@ -73,19 +325,28 @@
             </div>
             <div class="modal-body ps-5 pe-5 bg-dark">
                 <h1 class="modal-title mb-5 text-center text-white" id="staticBackdropLabel">What is your Mood?</h1>
-                <div class="row row-cols-2 row-cols-sm-4 row-cols-md-5 row-cols-lg-5 ">
+                @php $user = app('logged-in-user'); @endphp
+                <div class="row row-cols-2 row-cols-sm-4 row-cols-md-5 row-cols-lg-5">
                     @foreach ($category as $cat)
+                        @php
+                            if ($cat->id == 1 && $cat->name === 'Khlups') {
+                                $dedicatedUrl = route('khlups.view', ['tokengen' => 'default_token']);
+                            } else {
+                                $dedicatedUrl = route('mood.show', [
+                                    'id' => App\Helpers\VideoHelper::encryptID($cat->id),
+                                ]);
+                            }
+
+                            $moodHref = !$user
+                                ? route('login')
+                                : ($user->subscription !== 'Yes'
+                                    ? route('subscribe')
+                                    : $dedicatedUrl);
+                        @endphp
                         <div class="col">
-                            @php
-                                if ($cat->id == 1 && $cat->name === 'Khlups') {
-                                    $route = route('khlups.view', ['tokengen' => 'default_token']);
-                                } else {
-                                    $route = route('mood.show', ['id' => App\Helpers\VideoHelper::encryptID($cat->id)]);
-                                }
-                            @endphp
-                            <a href="{{ $route }} ">
+                            <a href="{{ $moodHref }}">
                                 <div class="card text-bg-dark mb-4">
-                                    <img src="https://alphastudioz.in/admin_panel/public/images/category/{{ $cat->image }}"
+                                    <img src="{{ config('app.website_url') }}admin_panel/public/images/category/{{ $cat->image }}"
                                         class="card-img" alt="...">
                                     <div class="card-img-overlay overlay">
                                         <div class="movie-short-description p-2">
@@ -101,18 +362,40 @@
         </div>
     </div>
 </div>
+<!-- Downtime Modal -->
+<div class="modal fade" id="downtimeModal" tabindex="-1" aria-labelledby="downtimeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="downtimeModalLabel">Scheduled Maintenance</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Razorpay is undergoing scheduled maintenance right now.<br>
+                Please try again after the maintenance window ends.
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Okay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@include('subscription')
 <footer>
     <div class="footer-section">
         <div class="footer-section-container">
             <div class="container-fluid">
                 <div class="logo-container">
-                    <img src="{{ url('/') }}/asset/images/logo.png" alt="">
+                    <a href="{{ url('/') }}"><img src="{{ url('/') }}/asset/images/logo.png" alt=""></a>
                 </div>
                 <div class="quick-links-container pb-3">
                     <ul>
                         <li><a href="{{ route('home') }}">Home</a></li>
                         <li><a href="{{ route('contact-us') }}">Contact</a></li>
                         <li><a href="{{ route('aboutus') }}">About</a></li>
+                        <li class="quick-link-break"></li>
                         <li><a href="{{ route('footer.privacy') }}">Privacy & Policy</a></li>
                         <li><a href="{{ route('footer.refund') }}">Refund Policy</a></li>
                         <li><a href="{{ route('footer.terms&co') }}">Terms & Conditions</a></li>
@@ -120,16 +403,67 @@
                 </div>
 
                 <div class="paragraph col-6 m-auto">
-                    <p>All Rights Reserved @2025 - Alphastudioz</p>
+                    <p>All Rights Reserved @2025 - {{ config('app.project_name') }}</p>
                 </div>
-                <div class="app-links-container mb-3">
+
+                <div class="youtube-links-container mb-4">
+                    <p class="text-white mb-2">Watch on socials</p>
+                    <div class="store-links d-flex align-items-center gap-2 flex-wrap">
+                        <!-- YouTube -->
+                        <a href="https://www.youtube.com/@AlphaNeonStudioz" target="_blank" title="YouTube">
+                            <svg class="store-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="2" width="28" height="28" rx="6" fill="#FF0000" />
+                                <path d="M13 10.5L21 16L13 21.5V10.5Z" fill="white" />
+                            </svg>
+                        </a>
+                        <!-- Instagram -->
+                        <a href="https://www.instagram.com/alphaneonstudioz/" target="_blank" title="Instagram">
+                            <svg class="store-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <radialGradient id="ig-grad-footer" cx="30%" cy="107%" r="150%">
+                                    <stop offset="0%" stop-color="#fdf497" />
+                                    <stop offset="5%" stop-color="#fdf497" />
+                                    <stop offset="45%" stop-color="#fd5949" />
+                                    <stop offset="60%" stop-color="#d6249f" />
+                                    <stop offset="90%" stop-color="#285AEB" />
+                                </radialGradient>
+                                <rect x="2" y="2" width="28" height="28" rx="6" fill="url(#ig-grad-footer)" />
+                                <rect x="9.5" y="9.5" width="13" height="13" rx="3.5" stroke="white" stroke-width="1.8" fill="none" />
+                                <circle cx="16" cy="16" r="3" stroke="white" stroke-width="1.8" fill="none" />
+                                <circle cx="19.5" cy="12.5" r="0.9" fill="white" />
+                            </svg>
+                        </a>
+                        <!-- Facebook -->
+                        <a href="https://www.facebook.com/people/AlphaNeon-Studioz/61558053870790/" target="_blank" title="Facebook">
+                            <svg class="store-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="2" width="28" height="28" rx="6" fill="#1877F2" />
+                                <path d="M19.0486 27.3346V18.5757H21.4312L21.7844 15.422H19.0486V13.7284C19.0486 12.8589 19.236 12.335 20.4054 12.335C21.486 12.335 22.4761 12.3444 22.4761 12.3444L22.3996 9.39943C22.3996 9.39943 21.4287 9.27707 20.1157 9.27707C16.8727 9.27707 15.4653 11.2209 15.4653 13.3376V15.422H13.0828V18.5757H15.4653V27.3346H19.0486Z" fill="white" />
+                            </svg>
+                        </a>
+                        <!-- X (Twitter) -->
+                        <a href="https://x.com/AlphaStudioz_" target="_blank" title="X (Twitter)">
+                            <svg class="store-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="2" width="28" height="28" rx="6" fill="#000000" stroke="#444" stroke-width="1" />
+                                <path d="M21.5375 7.98438H24.758L17.723 16.0454L26 27.0164H19.52L14.441 20.3639L8.636 27.0164H5.4125L12.9365 18.3914L5 7.98588H11.645L16.229 14.0654L21.5375 7.98438ZM20.405 25.0844H22.19L10.67 9.81588H8.756L20.405 25.0844Z" fill="white" />
+                            </svg>
+                        </a>
+                        <!-- LinkedIn -->
+                        <a href="https://www.linkedin.com/company/103164376/admin/feed/posts/?feedType=following" target="_blank" title="LinkedIn">
+                            <svg class="store-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="2" width="28" height="28" rx="6" fill="#0A66C2" />
+                                <path d="M9.8436 24.3321V10.8381H5.26986V24.3321H9.8436ZM7.55732 8.99459C9.15227 8.99459 10.145 7.95841 10.145 6.66353C10.1153 5.33945 9.15233 4.33203 7.58759 4.33203C6.0231 4.33203 5 5.33947 5 6.66353C5 7.95847 5.99253 8.99459 7.52744 8.99459H7.55718H7.55732ZM12.3752 24.3321H16.9489V16.7964C16.9489 16.3931 16.9786 15.9902 17.0994 15.7019C17.43 14.8961 18.1826 14.0615 19.446 14.0615C21.1011 14.0615 21.7632 15.299 21.7632 17.113V24.332H26.3367V16.5946C26.3367 12.4498 24.0802 10.5213 21.071 10.5213C18.6036 10.5213 17.5203 11.8737 16.9185 12.7948H16.949V10.8378H12.3753C12.4353 12.104 12.3753 24.3318 12.3753 24.3318L12.3752 24.3321Z" fill="white" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="app-links-container mb-4">
                     <p class="text-white mb-2">Download our App</p>
                     <div class="store-links d-flex align-items-center gap-3 flex-wrap">
-                          <!-- App Icon -->
+                        <!-- App Icon -->
                         <img src="{{ url('/') }}/asset/icons/alphaApp.jpg" class="app-icon"
-                            alt="Alphastudioz App Icon">
+                            alt="{{ config('app.project_name') }} App Icon">
                         <!-- Google Play -->
-                        <a href="https://play.google.com/store/apps/details?id=com.alphastudioz.alphaneonstudioz"
+                        <a href="https://play.google.com/store/apps/details?id=com.{{ config('app.project_name') }}.alphaneonstudioz"
                             target="_blank">
                             <img src="{{ url('/') }}/asset/icons/play-store.png" class="store-icon"
                                 alt="Google Play Store">
@@ -141,95 +475,1762 @@
                                 alt="Apple App Store">
                         </a>
 
-                      
+
                     </div>
                 </div>
-                <div class="block-des">
+                <div style="clear: both;"></div>
+                {{-- <div class="block-des">
                     <div class="row">
                         <div class="col-md-5 p-0">
                             <div class="black-block-start"></div>
                         </div>
                         <div class="col-md-2">
-                            <div class="social-links">
-                                <ul class="p-0">
-                                    <li><a href="https://www.facebook.com/people/AlphaNeon-Studioz/61558053870790/"
-                                            target="_blank">
-                                            <svg width="18" height="18" viewBox="0 0 10 20" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M3.0486 19.3346V10.5757H0.666016V7.42205H3.0486V4.72844C3.0486 2.61177 4.456 0.667969 7.69896 0.667969C9.01198 0.667969 9.98289 0.790329 9.98289 0.790329L9.90639 3.73529C9.90639 3.73529 8.91621 3.72592 7.83568 3.72592C6.66622 3.72592 6.47886 4.2498 6.47886 5.11932V7.42205H9.99935L9.84617 10.5757H6.47886V19.3346H3.0486Z"
-                                                    fill="white" />
-                                            </svg>
-                                        </a></li>
-                                    <li><a href="https://x.com/AlphaStudioz_" target="_blank">
-                                            <svg width="15" height="15" viewBox="0 0 21 21" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M16.5375 0.984375H19.758L12.723 9.04538L21 20.0164H14.52L9.441 13.3639L3.636 20.0164H0.4125L7.9365 11.3914L0 0.985875H6.645L11.229 7.06537L16.5375 0.984375ZM15.405 18.0844H17.19L5.67 2.81587H3.756L15.405 18.0844Z"
-                                                    fill="white" />
-                                            </svg>
-                                        </a></li>
-                                    <li>
-                                        <a href="https://www.linkedin.com/company/103164376/admin/feed/posts/?feedType=following"
-                                            target="_blank">
-                                            <svg width="17" height="17" viewBox="0 0 22 21" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M5.5096 20.3321V6.83807H0.935864V20.3321H5.5096ZM3.22332 4.99459C4.81827 4.99459 5.81104 3.95841 5.81104 2.66353C5.78132 1.33945 4.81833 0.332031 3.25359 0.332031C1.6891 0.332031 0.666016 1.33947 0.666016 2.66353C0.666016 3.95847 1.65855 4.99459 3.19346 4.99459H3.22318H3.22332ZM8.04115 20.3321H12.6149V12.7964C12.6149 12.3931 12.6446 11.9902 12.7654 11.7019C13.096 10.8961 13.8486 10.0615 15.112 10.0615C16.7671 10.0615 17.4292 11.299 17.4292 13.113V20.332H22.0027V12.5946C22.0027 8.44981 19.7462 6.52127 16.737 6.52127C14.2696 6.52127 13.1863 7.87371 12.5845 8.79485H12.615V6.83779H8.04125C8.10127 8.10399 8.04125 20.3318 8.04125 20.3318L8.04115 20.3321Z"
-                                                    fill="white" />
-                                            </svg>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="https://www.instagram.com/alphaneonstudioz/" target="_blank">
-                                            <svg width="18" height="18" viewBox="0 0 22 22" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M11.3371 5.60976C8.30853 5.60976 5.86568 8.01445 5.86568 10.9957C5.86568 13.9769 8.30853 16.3816 11.3371 16.3816C14.3657 16.3816 16.8085 13.9769 16.8085 10.9957C16.8085 8.01445 14.3657 5.60976 11.3371 5.60976ZM11.3371 14.4973C9.37996 14.4973 7.77996 12.9269 7.77996 10.9957C7.77996 9.06445 9.3752 7.49414 11.3371 7.49414C13.299 7.49414 14.8942 9.06445 14.8942 10.9957C14.8942 12.9269 13.2942 14.4973 11.3371 14.4973ZM18.3085 5.38945C18.3085 6.08789 17.7371 6.6457 17.0323 6.6457C16.3228 6.6457 15.7561 6.0832 15.7561 5.38945C15.7561 4.6957 16.3276 4.1332 17.0323 4.1332C17.7371 4.1332 18.3085 4.6957 18.3085 5.38945ZM21.9323 6.66445C21.8514 4.98164 21.4609 3.49101 20.2085 2.26289C18.9609 1.03477 17.4466 0.650391 15.7371 0.566016C13.9752 0.467578 8.69425 0.467578 6.93234 0.566016C5.22758 0.645703 3.7133 1.03008 2.46092 2.2582C1.20854 3.48633 0.822824 4.97695 0.737109 6.65976C0.637109 8.39414 0.637109 13.5926 0.737109 15.3269C0.818062 17.0098 1.20854 18.5004 2.46092 19.7285C3.7133 20.9566 5.22282 21.341 6.93234 21.4254C8.69425 21.5238 13.9752 21.5238 15.7371 21.4254C17.4466 21.3457 18.9609 20.9613 20.2085 19.7285C21.4561 18.5004 21.8466 17.0098 21.9323 15.3269C22.0323 13.5926 22.0323 8.39882 21.9323 6.66445ZM19.6561 17.1879C19.2847 18.1066 18.5657 18.8144 17.6276 19.1848C16.2228 19.7332 12.8895 19.6066 11.3371 19.6066C9.78472 19.6066 6.44663 19.7285 5.04663 19.1848C4.1133 18.8191 3.39425 18.1113 3.01806 17.1879C2.46092 15.8051 2.58949 12.5238 2.58949 10.9957C2.58949 9.46757 2.46568 6.18164 3.01806 4.80351C3.38949 3.88476 4.10854 3.17695 5.04663 2.80664C6.45139 2.2582 9.78472 2.38476 11.3371 2.38476C12.8895 2.38476 16.2276 2.26289 17.6276 2.80664C18.5609 3.17226 19.28 3.88008 19.6561 4.80351C20.2133 6.18633 20.0847 9.46757 20.0847 10.9957C20.0847 12.5238 20.2133 15.8098 19.6561 17.1879Z"
-                                                    fill="white" />
-                                            </svg>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="https://www.youtube.com/@AlphaNeonStudioz" target="_blank">
-                                            <svg width="25" height="25" viewBox="0 0 32 32" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M13.3335 11.334L21.3335 16.0007L13.3335 20.6673V11.334Z"
-                                                    fill="white" />
-                                                <path
-                                                    d="M16 6.66602C28 6.66602 28 6.66602 28 15.9993C28 25.3327 28 25.3327 16 25.3327C4 25.3327 4 25.3327 4 15.9993C4 6.66602 4 6.66602 16 6.66602Z"
-                                                    stroke="white" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                            <div class="social-links" style="min-height: 35px;"></div>
                         </div>
                         <div class="col-md-5 p-0">
                             <div class="black-block-end"></div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
 </footer>
 </main>
-<!-- Bootstrap JavaScript Libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-{{-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script> --}}
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
-    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous">
+{{-- <script src="{{ URL::to('asset/js/jquery.min.js') }}"></script> --}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js?v={{ time() }}"></script>
+<script src="{{ URL::to('asset/js/jquery.validate.min.js') }}"></script>
+<script src="{{ URL::to('/asset/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ URL::to('asset/js/popper.min.js') }}"></script>
+<script src="{{ URL::to('asset/js/sweetalert2@11.js') }}"></script>
+<style>
+    /* Global Dark Website Theme for SweetAlert2 Popups */
+    .swal2-popup {
+        background-color: #1a1a1a !important;
+        color: #ffffff !important;
+        border: 1px solid #333333 !important;
+        border-radius: 16px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
+    }
+    .swal2-title {
+        color: #ffffff !important;
+    }
+    .swal2-html-container, .swal2-content {
+        color: #d1d5db !important;
+    }
+    .swal2-confirm {
+        background-color: #FF3A1F !important;
+        color: #ffffff !important;
+        border-radius: 8px !important;
+        padding: 10px 24px !important;
+        font-weight: 600 !important;
+        box-shadow: 0 4px 12px rgba(255, 58, 31, 0.3) !important;
+    }
+    .swal2-confirm:hover {
+        background-color: #e0321a !important;
+    }
+    .swal2-icon.swal2-info {
+        border-color: #FF3A1F !important;
+        color: #FF3A1F !important;
+    }
+    .swal2-icon.swal2-info .swal2-icon-content {
+        color: #FF3A1F !important;
+    }
+    .swal2-icon.swal2-error {
+        border-color: #FF3A1F !important;
+        color: #FF3A1F !important;
+    }
+    .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+        background-color: #FF3A1F !important;
+    }
+</style>
+<script src="{{ URL::to('asset/js/bootstrap.min.js') }}"></script>
+<script src="{{ URL::to('asset/js/owl.carousel.min.js?v=' . uniqid()) }}"></script>
+<script src="{{ URL::to('asset/js/aos.js') }}"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5792165796361069">
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ url('/') }}/asset/js/owl.carousel.min.js?v={{ time() }}"></script>
-<script src="{{ url('/') }}/asset/js/plyr.js?v={{ time() }}"></script>
-{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.6.4/plyr.js" integrity="sha512-M/AUlH5tMMuhvt9trN4rXBjsXq9HrOUmtblZHhesbx97sGycEnXX/ws1W7yyrF8zEjotdNhYNfHOd3WMu96eKA==" crossorigin="anonymous"></script> --}}
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script src="{{ url('/') }}/asset/js/script.js?v={{ time() }}"></script>
+<script src="{{ URL::to('/asset/js/toastr.min.js') }}"></script>
+<script src="{{ URL::to('asset/js/script.js?v=' . uniqid()) }}"></script>
+<script src="{{ URL::to('asset/js/firebase-app-compat.js') }}"></script>
+<script src="{{ URL::to('asset/js/firebase-messaging-compat.js') }}"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+{{-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script> --}}
+
+<script>
+  
+    const razorpayDowntimeWindows = [{
+            start: new Date("2025-08-07T01:00:00+05:30"),
+            end: new Date("2025-08-07T02:00:00+05:30"),
+            message: "7th August 2025, 1:00 AM to 2:00 AM IST"
+        },
+        {
+            start: new Date("2025-08-13T01:00:00+05:30"),
+            end: new Date("2025-08-13T01:30:00+05:30"),
+            message: "13th August 2025, 1:00 AM to 1:30 AM IST"
+        },
+        {
+            start: new Date("2025-08-19T01:00:00+05:30"),
+            end: new Date("2025-08-19T02:00:00+05:30"),
+            message: "19th August 2025, 1:00 AM to 2:00 AM IST"
+        },
+        {
+            start: new Date("2025-08-19T03:30:00+05:30"),
+            end: new Date("2025-08-19T04:00:00+05:30"),
+            message: "19th August 2025, 3:30 AM to 4:00 AM IST"
+        }
+    ];
+
+
+    function getCurrentDowntimeWindow() {
+        const now = new Date();
+        const nowIST = new Date(now.toLocaleString("en-US", {
+            timeZone: "Asia/Kolkata"
+        }));
+
+        return razorpayDowntimeWindows.find(({
+            start,
+            end
+        }) => nowIST >= start && nowIST <= end);
+    }
+</script>
+<script>
+    let isAnySubscriptionProcessing = false;
+
+    const showLoader = () => document.getElementById('loadingOverlay').style.display = 'flex';
+    const hideLoader = () => document.getElementById('loadingOverlay').style.display = 'none';
+
+    if (!window._rzpListenerAttached) {
+        window._rzpListenerAttached = true;
+
+        document.addEventListener('click', async function(e) {
+            const button = e.target.closest('.rzp-button');
+            if (!button) return;
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            const isUserLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
+            if (!isUserLoggedIn) {
+                window.location.href = "{{ route('login') }}";
+                return;
+            }
+
+            const currentDowntime = getCurrentDowntimeWindow();
+            if (currentDowntime) {
+                document.querySelector('#downtimeModal .modal-body').innerHTML = `
+                                Razorpay is undergoing scheduled maintenance right now.<br>
+                                <strong>Maintenance Window:</strong><br>${currentDowntime.message}<br>
+                                Please try again after the window ends.
+                            `;
+
+                const modal = new bootstrap.Modal(document.getElementById('downtimeModal'));
+                modal.show();
+                return;
+            }
+
+            if (isAnySubscriptionProcessing || window._isRzpSubscriptionBusy) return;
+            isAnySubscriptionProcessing = true;
+            window._isRzpSubscriptionBusy = true;
+            showLoader();
+
+            const form = button.closest('form');
+            const amount = button.dataset.amount;
+            const planId = button.dataset.planId;
+            const packageId = button.dataset.packageId;
+
+            try {
+                const response = await fetch('{{ route('subscription.create') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': `{{ csrf_token() }}`,
+                    },
+                    body: JSON.stringify({
+                        plan_id: planId,
+                        package_id: packageId
+                    }),
+                });
+
+                if (response.status === 401) {
+                    window.location.href = "{{ route('login') }}";
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.unauthenticated || data.redirect) {
+                    window.location.href = data.redirect || "{{ route('login') }}";
+                    return;
+                }
+
+                if (!data.subscription_id) {
+                    alert("⚠️ Unable to create subscription. Please try again later.");
+                    isAnySubscriptionProcessing = false;
+                    hideLoader();
+                    return;
+                }
+
+                const prefillObj = {};
+                const uName = "{{ auth()->check() && auth()->user()->name ? auth()->user()->name : '' }}".trim();
+                const uEmail = "{{ auth()->check() && auth()->user()->email ? auth()->user()->email : '' }}".trim();
+                const rawContact = "{{ auth()->check() && auth()->user()->mobile_no ? auth()->user()->mobile_no : '' }}";
+                const uContact = rawContact.replace(/\D/g, '').trim();
+
+                if (uName && uName !== 'Guest') prefillObj.name = uName;
+                if (uEmail && uEmail.includes('@')) prefillObj.email = uEmail;
+                if (uContact && uContact.length >= 10) prefillObj.contact = uContact;
+
+                const options = {
+                    key: "{{ config('app.razorpay_key') ?: env('RAZORPAY_KEY') }}",
+                    subscription_id: data.subscription_id,
+                    name: "{{ config('app.project_full_name') }}",
+                    description: "Subscription Payment",
+                    prefill: prefillObj,
+                    remember_customer: false,
+                    handler: function(response) {
+                        document.getElementById('loader-overlay').style.display = 'block';
+                        if (form) {
+                            var finalSubId = (response && response.razorpay_subscription_id && response.razorpay_subscription_id !== 'undefined') 
+                                ? response.razorpay_subscription_id 
+                                : (data && data.subscription_id ? data.subscription_id : '');
+                            var finalPayId = (response && response.razorpay_payment_id) ? response.razorpay_payment_id : '';
+                            var finalSig = (response && response.razorpay_signature) ? response.razorpay_signature : '';
+
+                            var subInput = form.querySelector('.razorpay_subscription_id');
+                            var payInput = form.querySelector('.razorpay_payment_id');
+                            var sigInput = form.querySelector('.razorpay_signature');
+
+                            if (subInput) subInput.value = finalSubId;
+                            if (payInput) payInput.value = finalPayId;
+                            if (sigInput) sigInput.value = finalSig;
+
+                            form.submit();
+                        }
+                    },
+                    theme: {
+                        color: "#B01803"
+                    },
+                    modal: {
+                        ondismiss: () => {
+                            isAnySubscriptionProcessing = false;
+                            window._isRzpSubscriptionBusy = false;
+                            hideLoader();
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.on('payment.failed', function(resp) {
+                    let desc = resp.error && resp.error.description ? resp.error.description : 'Payment failed.';
+                    if (desc.includes('Please login') || desc.includes('failed')) {
+                        desc = 'Payment could not be completed. If prompted by Razorpay, please enter the OTP or try another payment option (Card / NetBanking / UPI QR).';
+                    }
+                    alert(desc);
+                    isAnySubscriptionProcessing = false;
+                    window._isRzpSubscriptionBusy = false;
+                    hideLoader();
+                });
+                rzp.open();
+                hideLoader();
+            } catch (error) {
+                console.error('Error creating subscription:', error);
+                alert("Something went wrong. Please check your internet and try again.");
+                isAnySubscriptionProcessing = false;
+                window._isRzpSubscriptionBusy = false;
+                hideLoader();
+            }
+        });
+    }
+</script>
+
+{{-- <script>
+    // personal firebase project
+    // const firebaseConfig = {
+    //     apiKey: "AIzaSyAHtDt6aE4YIKLTJdwySCguuAqle59RNdU",
+    //     authDomain: "{{ config('app.project_name') }}-48a4b.firebaseapp.com",
+    //     projectId: "{{ config('app.project_name') }}-48a4b",
+    //     storageBucket: "{{ config('app.project_name') }}-48a4b.firebasestorage.app",
+    //     messagingSenderId: "962385260494",
+    //     appId: "1:962385260494:web:e371cefb7d77a37ee8459f",
+    //     measurementId: "G-9KP78JB4J0"
+    // };
+
+    // live firebase project
+    const firebaseConfig = {
+        apiKey: "AIzaSyD59IArjGi3kWKb4YAlj0lO88bX3r25wl4",
+        authDomain: "{{ config('app.project_name') }}-425304.firebaseapp.com",
+        projectId: "{{ config('app.project_name') }}-425304",
+        storageBucket: "{{ config('app.project_name') }}-425304.firebasestorage.app",
+        messagingSenderId: "1070377629333",
+        appId: "1:1070377629333:web:3cb9bde2765a40dc750d9c",
+        measurementId: "G-335VR5Z4C8"
+    };
+
+
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+
+    messaging
+        .requestPermission()
+        .then(() => {
+            console.log("Notification permission granted.");
+            return messaging.getToken({
+                // vapidKey: "BD5CP2v-FGRnktwSKk8JV_fQC85Q4phXefiP_fXv_YYeSk6Jn9Fs-v9WlRBtrI7bHnZrGpeYytiFxUKqmaYZNj8"
+                vapidKey: "BFpXBa2Nws2reNU7a4HzCjTjsB9hk5-Cr0SPHcSPyzirdg1o0n64vT3jONJ8quMhdp9OyGDDJBRGdyfFXS3h8nc"
+            });
+        })
+        .then((currentToken) => {
+            if (currentToken) {
+                console.log("FCM Token:", currentToken);
+
+                // ✅ Now send the token to your Laravel backend
+                fetch("{{ config('app.website_url') }}UAT/public/api/save-token", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            device_token: currentToken
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Token saved on server:", data);
+                    })
+                    .catch(error => {
+                        console.error("Error sending token to server:", error);
+                    });
+
+            } else {
+                console.log("No registration token available.");
+            }
+        })
+        .catch((err) => {
+            console.error("An error occurred while retrieving token.", err);
+        });
+</script>  --}}
+<script>
+    var user_id = "{{$user ? $user->id : ''}}";
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const params = new URLSearchParams(window.location.search);
+
+        if (params.get('open_modal') === 'subscription') {
+            openSubscriptionModal();
+        }
+
+        const subModalEl = document.getElementById('subscriptionModal');
+        if (subModalEl) {
+            subModalEl.addEventListener('hidden.bs.modal', function () {
+                document.querySelectorAll('.modal-backdrop').forEach(function(b) {
+                    b.remove();
+                });
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            });
+        }
+    });
+
+    function openSubscriptionModal() {
+        let el = document.getElementById('subscriptionModal');
+        if (el) {
+            let modal = bootstrap.Modal.getOrCreateInstance(el);
+            modal.show();
+        }
+    }
+</script>
+<script type="module">
+    import {
+        initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+        getMessaging,
+        getToken
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD59IArjGi3kWKb4YAlj0lO88bX3r25wl4",
+        authDomain: "{{ config('app.project_name') }}-425304.firebaseapp.com",
+        projectId: "{{ config('app.project_name') }}-425304",
+        storageBucket: "{{ config('app.project_name') }}-425304.firebasestorage.app",
+        messagingSenderId: "1070377629333",
+        appId: "1:1070377629333:web:3cb9bde2765a40dc750d9c",
+        measurementId: "G-335VR5Z4C8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                    .then((registration) => {
+
+                        getToken(messaging, {
+                            vapidKey: "BFpXBa2Nws2reNU7a4HzCjTjsB9hk5-Cr0SPHcSPyzirdg1o0n64vT3jONJ8quMhdp9OyGDDJBRGdyfFXS3h8nc",
+                            serviceWorkerRegistration: registration
+                        }).then((currentToken) => {
+
+                            if (currentToken) {
+                                console.log("FCM Token:", currentToken);
+                            }
+
+                        });
+
+                    });
+            }
+            getToken(messaging, {
+                vapidKey: "BFpXBa2Nws2reNU7a4HzCjTjsB9hk5-Cr0SPHcSPyzirdg1o0n64vT3jONJ8quMhdp9OyGDDJBRGdyfFXS3h8nc"
+            }).then((currentToken) => {
+
+                if (currentToken) {
+                    console.log("FCM Token:", currentToken);
+                    console.log("user_id:", user_id);
+
+                    fetch("{{ config('app.website_url') }}public/api/save-token", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                device_token: currentToken,
+                                user_id: user_id
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => console.log("Token saved:", data))
+                        .catch(err => console.error(err));
+                }
+
+            }).catch(err => {
+                console.error("Token error:", err);
+            });
+
+        } else {
+            console.log("Permission denied");
+        }
+    });
+</script>
+<script>
+    const stateCityMap = {
+        "Andaman and Nicobar Islands": [
+            "Port Blair"
+        ],
+        "Andhra Pradesh": [
+            "Adoni",
+            "Amalapuram",
+            "Anakapalle",
+            "Anantapur",
+            "Bapatla",
+            "Bheemunipatnam",
+            "Bhimavaram",
+            "Bobbili",
+            "Chilakaluripet",
+            "Chirala",
+            "Chittoor",
+            "Dharmavaram",
+            "Eluru",
+            "Gudivada",
+            "Gudur",
+            "Guntakal",
+            "Guntur",
+            "Hindupur",
+            "Jaggaiahpet",
+            "Jammalamadugu",
+            "Kadapa",
+            "Kadiri",
+            "Kakinada",
+            "Kandukur",
+            "Kavali",
+            "Kovvur",
+            "Kurnool",
+            "Macherla",
+            "Machilipatnam",
+            "Madanapalle",
+            "Mandapeta",
+            "Markapur",
+            "Naidupet",
+            "Nagari",
+            "Nandyal",
+            "Narasapuram",
+            "Narasaraopet",
+            "Nidadavole",
+            "Nuzvid",
+            "Ongole",
+            "Palacole",
+            "Palasa Kasibugga",
+            "Parvathipuram",
+            "Pedana",
+            "Peddapuram",
+            "Pithapuram",
+            "Ponnur",
+            "Proddatur",
+            "Punganur",
+            "Puttur",
+            "Rajam",
+            "Rajampet",
+            "Rajahmundry",
+            "Ramachandrapuram",
+            "Rayachoti",
+            "Rayadurg",
+            "Renigunta",
+            "Repalle",
+            "Salur",
+            "Samalkot",
+            "Sattenapalle",
+            "Srikakulam",
+            "Srikalahasti",
+            "Srisailam Project (Right Flank Colony) Township",
+            "Sullurpeta",
+            "Tadepalligudem",
+            "Tadpatri",
+            "Tanuku",
+            "Tenali",
+            "Tirupati",
+            "Tiruvuru",
+            "Tuni",
+            "Uravakonda",
+            "Venkatagiri",
+            "Vijayawada",
+            "Vinukonda",
+            "Visakhapatnam",
+            "Vizianagaram",
+            "Yemmiganur",
+            "Yerraguntla"
+        ],
+        "Arunachal Pradesh": [
+            "Naharlagun",
+            "Pasighat"
+        ],
+        "Assam": [
+            "Barpeta",
+            "Bongaigaon City",
+            "Dhubri",
+            "Dibrugarh",
+            "Diphu",
+            "Goalpara",
+            "Guwahati",
+            "Jorhat",
+            "Karimganj",
+            "Lanka",
+            "Lumding",
+            "Mangaldoi",
+            "Mankachar",
+            "Margherita",
+            "Mariani",
+            "Marigaon",
+            "Nagaon",
+            "Nalbari",
+            "North Lakhimpur",
+            "Rangia",
+            "Sibsagar",
+            "Silchar",
+            "Silapathar",
+            "Tezpur",
+            "Tinsukia"
+        ],
+        "Bihar": [
+            "Araria",
+            "Arrah",
+            "Arwal",
+            "Asarganj",
+            "Aurangabad",
+            "Bagaha",
+            "Begusarai",
+            "Bettiah",
+            "Bhagalpur",
+            "BhabUrban Agglomeration",
+            "Buxar",
+            "Chhapra",
+            "Darbhanga",
+            "Dehri-on-Sone",
+            "Dumraon",
+            "Forbesganj",
+            "Gaya",
+            "Gopalganj",
+            "Hajipur",
+            "Jamalpur",
+            "Jamui",
+            "Jehanabad",
+            "Katihar",
+            "Kishanganj",
+            "Lakhisarai",
+            "Lalganj",
+            "Madhubani",
+            "Madhepura",
+            "Maharajganj",
+            "Mahnar Bazar",
+            "Makhdumpur",
+            "Maner",
+            "Manihari",
+            "Marhaura",
+            "Masaurhi",
+            "Mirganj",
+            "Mokameh",
+            "Motihari",
+            "Motipur",
+            "Munger",
+            "Murliganj",
+            "Muzaffarpur",
+            "Narkatiaganj",
+            "Naugachhia",
+            "Nawada",
+            "Nokha",
+            "Patna",
+            "Piro",
+            "Purnia",
+            "Rafiganj",
+            "Rajgir",
+            "Ramnagar",
+            "Raxaul Bazar",
+            "Revelganj",
+            "Rosera",
+            "Saharsa",
+            "Samastipur",
+            "Sasaram",
+            "Sheikhpura",
+            "Sheohar",
+            "Sherghati",
+            "Silao",
+            "Sitamarhi",
+            "Siwan",
+            "Sonepur",
+            "Sugauli",
+            "Sultanganj",
+            "Supaul",
+            "Warisaliganj"
+        ],
+        "Chandigarh": [
+            "Chandigarh"
+        ],
+        "Chhattisgarh": [
+            "Ambikapur",
+            "Bhatapara",
+            "Bhilai Nagar",
+            "Bilaspur",
+            "Chirmiri",
+            "Dalli-Rajhara",
+            "Dhamtari",
+            "Durg",
+            "Jagdalpur",
+            "Korba",
+            "Mahasamund",
+            "Manendragarh",
+            "Mungeli",
+            "Naila Janjgir",
+            "Raigarh",
+            "Raipur",
+            "Rajnandgaon",
+            "Sakti",
+            "Tilda Newra"
+        ],
+        "Dadra and Nagar Haveli": [
+            "Silvassa"
+        ],
+        "Delhi": [
+            "Delhi",
+            "New Delhi"
+        ],
+        "Goa": [
+            "Mapusa",
+            "Margao",
+            "Marmagao",
+            "Panaji"
+        ],
+        "Gujarat": [
+            "Adalaj",
+            "Ahmedabad",
+            "Amreli",
+            "Anand",
+            "Anjar",
+            "Ankleshwar",
+            "Bharuch",
+            "Bhavnagar",
+            "Bhuj",
+            "Chhapra",
+            "Deesa",
+            "Dhoraji",
+            "Gandhinagar",
+            "Godhra",
+            "Jamnagar",
+            "Kadi",
+            "Kapadvanj",
+            "Keshod",
+            "Khambhat",
+            "Lathi",
+            "Limbdi",
+            "Lunawada",
+            "Mahemdabad",
+            "Mahuva",
+            "Manavadar",
+            "Mandvi",
+            "Mangrol",
+            "Mansa",
+            "Mahesana",
+            "Modasa",
+            "Morvi",
+            "Nadiad",
+            "Navsari",
+            "Padra",
+            "Palanpur",
+            "Palitana",
+            "Pardi",
+            "Patan",
+            "Petlad",
+            "Porbandar",
+            "Radhanpur",
+            "Rajkot",
+            "Rajpipla",
+            "Rajula",
+            "Ranavav",
+            "Rapar",
+            "Salaya",
+            "Sanand",
+            "Savarkundla",
+            "Sidhpur",
+            "Sihor",
+            "Songadh",
+            "Surat",
+            "Talaja",
+            "Thangadh",
+            "Tharad",
+            "Umbergaon",
+            "Umreth",
+            "Una",
+            "Unjha",
+            "Upleta",
+            "Vadnagar",
+            "Vadodara",
+            "Valsad",
+            "Vapi",
+            "Veraval",
+            "Vijapur",
+            "Viramgam",
+            "Visnagar",
+            "Vyara",
+            "Wadhwan",
+            "Wankaner"
+        ],
+        "Haryana": [
+            "Bahadurgarh",
+            "Bhiwani",
+            "Charkhi Dadri",
+            "Faridabad",
+            "Fatehabad",
+            "Gohana",
+            "Gurgaon",
+            "Hansi",
+            "Hisar",
+            "Jind",
+            "Kaithal",
+            "Karnal",
+            "Ladwa",
+            "Mandi Dabwali",
+            "Mahendragarh",
+            "Narwana",
+            "Narnaul",
+            "Palwal",
+            "Panchkula",
+            "Panipat",
+            "Pehowa",
+            "Pinjore",
+            "Rania",
+            "Ratia",
+            "Rewari",
+            "Rohtak",
+            "Safidon",
+            "Samalkha",
+            "Sarsod",
+            "Shahbad",
+            "Sirsa",
+            "Sohna",
+            "Sonipat",
+            "Taraori",
+            "Thanesar",
+            "Tohana",
+            "Yamunanagar"
+        ],
+        "Himachal Pradesh": [
+            "Kullu",
+            "Mandi",
+            "Nahan",
+            "Palampur",
+            "Shimla",
+            "Solan",
+            "Sundarnagar"
+        ],
+        "Himachal Praddesh": [
+            "Manali"
+        ],
+        "Jammu and Kashmir": [
+            "Anantnag",
+            "Baramula",
+            "Jammu",
+            "KathUrban Agglomeration",
+            "Punch",
+            "Rajauri",
+            "Sopore",
+            "Srinagar",
+            "Udhampur"
+        ],
+        "Jharkhand": [
+            "Adityapur",
+            "Bokaro Steel City",
+            "Chaibasa",
+            "Chatra",
+            "Chirkunda",
+            "Deoghar",
+            "Dhanbad",
+            "Dumka",
+            "Giridih",
+            "Gumia",
+            "Hazaribag",
+            "Jamshedpur",
+            "Jhumri Tilaiya",
+            "Lohardaga",
+            "Madhupur",
+            "Medininagar (Daltonganj)",
+            "Mihijam",
+            "Musabani",
+            "Pakaur",
+            "Patratu",
+            "Phusro",
+            "Ramgarh",
+            "Ranchi",
+            "Sahibganj",
+            "Saunda",
+            "Simdega",
+            "Tenu dam-cum-Kathhara"
+        ],
+        "Karnataka": [
+            "Adyar",
+            "Afzalpur",
+            "Arsikere",
+            "Athni",
+            "Ballari",
+            "Belagavi",
+            "Bengaluru",
+            "Chikkamagaluru",
+            "Davanagere",
+            "Gokak",
+            "Hubli-Dharwad",
+            "Karwar",
+            "Kolar",
+            "Lakshmeshwar",
+            "Lingsugur",
+            "Maddur",
+            "Madhugiri",
+            "Madikeri",
+            "Magadi",
+            "Mahalingapura",
+            "Malavalli",
+            "Malur",
+            "Mandya",
+            "Mangaluru",
+            "Manvi",
+            "Mudalagi",
+            "Mudabidri",
+            "Muddebihal",
+            "Mudhol",
+            "Mulbagal",
+            "Mundargi",
+            "Mysore",
+            "Nanjangud",
+            "Nargund",
+            "Navalgund",
+            "Nelamangala",
+            "Pavagada",
+            "Piriyapatna",
+            "Puttur",
+            "Rabkavi Banhatti",
+            "Ramanagaram",
+            "Ramdurg",
+            "Ranebennuru",
+            "Ranibennur",
+            "Raayachuru",
+            "Robertson Pet",
+            "Ron",
+            "Sadalagi",
+            "Sagara",
+            "Sakaleshapura",
+            "Sanduru",
+            "Sankeshwara",
+            "Saundatti-Yellamma",
+            "Savanur",
+            "Sedam",
+            "Shahabad",
+            "Shahpur",
+            "Shiggaon",
+            "Shikaripur",
+            "Shivamogga",
+            "Shrirangapattana",
+            "Sidlaghatta",
+            "Sindagi",
+            "Sindhanur",
+            "Sira",
+            "Sirsi",
+            "Siruguppa",
+            "Srinivaspur",
+            "Surapura",
+            "Talikota",
+            "Tarikere",
+            "Tekkalakote",
+            "Terdal",
+            "Tiptur",
+            "Tumkur",
+            "Udupi",
+            "Vijayapura",
+            "Wadi",
+            "Yadgir"
+        ],
+        "Kerala": [
+            "Adoor",
+            "Alappuzha",
+            "Attingal",
+            "Chalakudy",
+            "Changanassery",
+            "Cherthala",
+            "Chittur-Thathamangalam",
+            "Guruvayoor",
+            "Kanhangad",
+            "Kannur",
+            "Kasaragod",
+            "Kayamkulam",
+            "Kochi",
+            "Kodungallur",
+            "Kollam",
+            "Kottayam",
+            "Koyilandy",
+            "Kozhikode",
+            "Kunnamkulam",
+            "Malappuram",
+            "Mattannur",
+            "Mavelikkara",
+            "Mavoor",
+            "Muvattupuzha",
+            "Nedumangad",
+            "Neyyattinkara",
+            "Nilambur",
+            "Ottappalam",
+            "Palakkad",
+            "Palai",
+            "Panamattom",
+            "Panniyannur",
+            "Pappinisseri",
+            "Paravoor",
+            "Pathanamthitta",
+            "Perinthalmanna",
+            "Peringathur",
+            "Perumbavoor",
+            "Ponnani",
+            "Punalur",
+            "Puthuppally",
+            "Shoranur",
+            "Taliparamba",
+            "Thiruvananthapuram",
+            "Thiruvalla",
+            "Thodupuzha",
+            "Thrissur",
+            "Tirur",
+            "Vaikom",
+            "Varkala",
+            "Vatakara"
+        ],
+        "Madhya Pradesh": [
+            "Alirajpur",
+            "Ashok Nagar",
+            "Balaghat",
+            "Bhopal",
+            "Ganjbasoda",
+            "Gwalior",
+            "Indore",
+            "Itarsi",
+            "Jabalpur",
+            "Lahar",
+            "Maihar",
+            "Malaj Khand",
+            "Manasa",
+            "Manawar",
+            "Mandideep",
+            "Mandla",
+            "Mandsaur",
+            "Mauganj",
+            "Maharajpur",
+            "Mahidpur",
+            "Mhow Cantonment",
+            "Mhowgaon",
+            "Morena",
+            "Multai",
+            "Mundi",
+            "Nagda",
+            "Nainpur",
+            "Narsinghgarh",
+            "Narsinghgarh",
+            "Neemuch",
+            "Nepanagar",
+            "Niwari",
+            "Nowgong",
+            "Nowrozabad (Khodargama)",
+            "Pachore",
+            "Pali",
+            "Panagar",
+            "Pandhurna",
+            "Panna",
+            "Pasan",
+            "Phulabani",
+            "Pipariya",
+            "Pithampur",
+            "Porsa",
+            "Prithvipur",
+            "Raghavgarh-Vijaypur",
+            "Rahatgarh",
+            "Raisen",
+            "Rajgarh",
+            "Ratlam",
+            "Rau",
+            "Rehli",
+            "Rewa",
+            "Sabalgarh",
+            "Sagar",
+            "Sanawad",
+            "Sarangpur",
+            "Sarni",
+            "Satna",
+            "Sausar",
+            "Sehore",
+            "Sendhwa",
+            "Seoni",
+            "Seoni-Malwa",
+            "Shahdol",
+            "Shajapur",
+            "Shamgarh",
+            "Sheopur",
+            "Shivpuri",
+            "Shujalpur",
+            "Sidhi",
+            "Sihora",
+            "Singrauli",
+            "Sironj",
+            "Sohagpur",
+            "Tarana",
+            "Tikamgarh",
+            "Umaria",
+            "Ujjain",
+            "Vidisha",
+            "Vijaypur",
+            "Wara Seoni"
+        ],
+        "Maharashtra": [
+            "Achalpur",
+            "Ahmednagar",
+            "Akola",
+            "Akot",
+            "Amalner",
+            "Ambejogai",
+            "Amravati",
+            "Anjangaon",
+            "Arvi",
+            "Aurangabad",
+            "Bhiwandi",
+            "Dhule",
+            "Ichalkaranji",
+            "Kalyan-Dombivali",
+            "Karjat",
+            "Latur",
+            "Loha",
+            "Lonar",
+            "Lonavla",
+            "Mahad",
+            "Malegaon",
+            "Malkapur",
+            "Manjlegaon",
+            "Manmad",
+            "Manwath",
+            "Mangalvedhe",
+            "Mangrulpir",
+            "Mehkar",
+            "Mira-Bhayandar",
+            "Morshi",
+            "Murtijapur",
+            "Mumbai",
+            "Mukhed",
+            "Mul",
+            "Nanded-Waghala",
+            "Nandgaon",
+            "Nandura",
+            "Nandurbar",
+            "Narkhed",
+            "Nashik",
+            "Nawapur",
+            "Nilanga",
+            "Osmanabad",
+            "Ozar",
+            "Pachora",
+            "Paithan",
+            "Palghar",
+            "Pandharkaoda",
+            "Pandharpur",
+            "Panvel",
+            "Parbhani",
+            "Parli",
+            "Partur",
+            "Patur",
+            "Pauni",
+            "Pen",
+            "Phaltan",
+            "Purna",
+            "Pune",
+            "Pusad",
+            "Rahuri",
+            "Rajura",
+            "Ramtek",
+            "Ratnagiri",
+            "Raver",
+            "Risod",
+            "Sailu",
+            "Sangamner",
+            "Sangli",
+            "Sangole",
+            "Sasvad",
+            "Satana",
+            "Satara",
+            "Savner",
+            "Sawantwadi",
+            "Shahade",
+            "Shegaon",
+            "Shendurjana",
+            "Shirdi",
+            "Shirpur-Warwade",
+            "Shirur",
+            "Shrigonda",
+            "Shrirampur",
+            "Sillod",
+            "Sinnar",
+            "Solapur",
+            "Soyagaon",
+            "Talegaon Dabhade",
+            "Talode",
+            "Tasgaon",
+            "Thane",
+            "Tirora",
+            "Tuljapur",
+            "Tumsar",
+            "Uchgaon",
+            "Udgir",
+            "Umarga",
+            "Umred",
+            "Umarkhed",
+            "Uran",
+            "Uran Islampur",
+            "Vaijapur",
+            "Vasai-Virar",
+            "Vita",
+            "Vadgaon Kasba",
+            "Wadgaon Road",
+            "Wai",
+            "Wani",
+            "Warora",
+            "Warud",
+            "Washim",
+            "Yavatmal",
+            "Yawal",
+            "Yevla"
+        ],
+        "Manipur": [
+            "Imphal",
+            "Lilong",
+            "Mayang Imphal",
+            "Thoubal"
+        ],
+        "Meghalaya": [
+            "Nongstoin",
+            "Shillong",
+            "Tura"
+        ],
+        "Mizoram": [
+            "Aizawl",
+            "Lunglei",
+            "Saiha"
+        ],
+        "Nagaland": [
+            "Dimapur",
+            "Kohima",
+            "Mokokchung",
+            "Tuensang",
+            "Wokha",
+            "Zunheboto"
+        ],
+        "Odisha": [
+            "Baleshwar Town",
+            "Balangir",
+            "Barbil",
+            "Bargarh",
+            "Baripada Town",
+            "Bhadrak",
+            "Bhawanipatna",
+            "Bhubaneswar",
+            "Brahmapur",
+            "Byasanagar",
+            "Cuttack",
+            "Dhenkanal",
+            "Jatani",
+            "Jharsuguda",
+            "Kendrapara",
+            "Kendujhar",
+            "Malkangiri",
+            "Nabarangapur",
+            "Paradip",
+            "Parlakhemundi",
+            "Pattamundai",
+            "Puri",
+            "Rajagangapur",
+            "Rairangpur",
+            "Raurkela",
+            "Rayagada",
+            "Sambalpur",
+            "Soro",
+            "Sunabeda",
+            "Sundargarh",
+            "Talcher",
+            "Tarbha",
+            "Titlagarh"
+        ],
+        "Puducherry": [
+            "Karaikal",
+            "Mahe",
+            "Pondicherry",
+            "Yanam"
+        ],
+        "Punjab": [
+            "Amritsar",
+            "Barnala",
+            "Batala",
+            "Bathinda",
+            "Dhuri",
+            "Faridkot",
+            "Fazilka",
+            "Firozpur",
+            "Firozpur Cantt.",
+            "Gobindgarh",
+            "Gurdaspur",
+            "Hoshiarpur",
+            "Jagraon",
+            "Jalandhar",
+            "Jalandhar Cantt.",
+            "Kapurthala",
+            "Kharar",
+            "Khanna",
+            "Kot Kapura",
+            "Longowal",
+            "Ludhiana",
+            "Malerkotla",
+            "Malout",
+            "Mansa",
+            "Moga",
+            "Mohali",
+            "Morinda, India",
+            "Mukerian",
+            "Muktsar",
+            "Nabha",
+            "Nakodar",
+            "Nangal",
+            "Nawanshahr",
+            "Pathankot",
+            "Patiala",
+            "Patti",
+            "Pattran",
+            "Phagwara",
+            "Phillaur",
+            "Qadian",
+            "Raikot",
+            "Rajpura",
+            "Rampura Phul",
+            "Rupnagar",
+            "Samana",
+            "Sangrur",
+            "Sirhind Fatehgarh Sahib",
+            "Sujanpur",
+            "Sunam",
+            "Talwara",
+            "Tarn Taran",
+            "Urmar Tanda",
+            "Zira",
+            "Zirakpur"
+        ],
+        "Rajasthan": [
+            "Ajmer",
+            "Alwar",
+            "Barmer",
+            "Bharatpur",
+            "Bhilwara",
+            "Bikaner",
+            "Jaipur",
+            "Jodhpur",
+            "Lachhmangarh",
+            "Ladnu",
+            "Lakheri",
+            "Lalsot",
+            "Losal",
+            "Makrana",
+            "Malpura",
+            "Mandalgarh",
+            "Mandawa",
+            "Mangrol",
+            "Merta City",
+            "Mount Abu",
+            "Nadbai",
+            "Nagar",
+            "Nagaur",
+            "Nasirabad",
+            "Nathdwara",
+            "Neem-Ka-Thana",
+            "Nimbahera",
+            "Nohar",
+            "Nokha",
+            "Pali",
+            "Phalodi",
+            "Phulera",
+            "Pilani",
+            "Pilibanga",
+            "Pipar City",
+            "Pindwara",
+            "Prantij",
+            "Pratapgarh",
+            "Rajakhera",
+            "Rajaldesar",
+            "Rajgarh (Alwar)",
+            "Rajgarh (Churu)",
+            "Rajsamand",
+            "Ramganj Mandi",
+            "Ramngarh",
+            "Raisinghnagar",
+            "Ratangarh",
+            "Rawatbhata",
+            "Rawatsar",
+            "Reengus",
+            "Sadri",
+            "Sadulpur",
+            "Sadulshahar",
+            "Sagwara",
+            "Sambhar",
+            "Sanchore",
+            "Sangaria",
+            "Sardarshahar",
+            "Sawai Madhopur",
+            "Shahpura",
+            "Shahpura",
+            "Sheoganj",
+            "Sikar",
+            "Sirohi",
+            "Sojat",
+            "Sri Madhopur",
+            "Sujangarh",
+            "Sumerpur",
+            "Suratgarh",
+            "Takhatgarh",
+            "Taranagar",
+            "Todabhim",
+            "Todaraisingh",
+            "Tonk",
+            "Udaipur",
+            "Udaipurwati",
+            "Vijainagar, Ajmer"
+        ],
+        "Tamil Nadu": [
+            "Arakkonam",
+            "Aruppukkottai",
+            "Chennai",
+            "Coimbatore",
+            "Erode",
+            "Gobichettipalayam",
+            "Kancheepuram",
+            "Karur",
+            "Madurai",
+            "Nagapattinam",
+            "Nagercoil",
+            "Namakkal",
+            "Namagiripettai",
+            "Nandivaram-Guduvancheri",
+            "Nellikuppam",
+            "Neyveli (TS)",
+            "O' Valley",
+            "Oddanchatram",
+            "Pacode",
+            "Padmanabhapuram",
+            "Palani",
+            "Palladam",
+            "Pallapatti",
+            "Pallikonda",
+            "Panruti",
+            "Paramakudi",
+            "Parangipettai",
+            "Pattukkottai",
+            "Perambalur",
+            "Peravurani",
+            "Periyakulam",
+            "Periyasemur",
+            "Pernampattu",
+            "Polur",
+            "Pollachi",
+            "Ponneri",
+            "Pudukkottai",
+            "Pudupattinam",
+            "Puliyankudi",
+            "Punjaipugalur",
+            "Rajapalayam",
+            "Ramanathapuram",
+            "Ranipet",
+            "Rasipuram",
+            "Rameshwaram",
+            "Salem",
+            "Sankarankovil",
+            "Sankari",
+            "Sathyamangalam",
+            "Sattur",
+            "Shenkottai",
+            "Sholavandan",
+            "Sholingur",
+            "Sirkali",
+            "Sivaganga",
+            "Sivagiri",
+            "Sivakasi",
+            "Surandai",
+            "Suriyampalayam",
+            "Tindivanam",
+            "Thammampatti",
+            "Thanjavur",
+            "Tharamangalam",
+            "Tharangambadi",
+            "Theni Allinagaram",
+            "Thiruvarur",
+            "Thirumangalam",
+            "Thiruppuvanam",
+            "Thiruthuraipoondi",
+            "Thiruvallur",
+            "Tiruchendur",
+            "Tiruchengode",
+            "Tiruchirappalli",
+            "Tirukalukundram",
+            "Tirukkoyilur",
+            "Tirunelveli",
+            "Tirupathur",
+            "Tirupathur",
+            "Tiruppur",
+            "Tiruttani",
+            "Tiruvannamalai",
+            "Tiruvethipuram",
+            "Tittakudi",
+            "Thuraiyur",
+            "Udumalaipettai",
+            "Udhagamandalam",
+            "Unnamalaikadai",
+            "Usilampatti",
+            "Uthamapalayam",
+            "Uthiramerur",
+            "Vadalur",
+            "Vadakkuvalliyur",
+            "Vadipatti",
+            "Valparai",
+            "Vandavasi",
+            "Vaniyambadi",
+            "Vedaranyam",
+            "Vellakoil",
+            "Vellore",
+            "Vikramasingapuram",
+            "Viluppuram",
+            "Virudhachalam",
+            "Virudhunagar",
+            "Viswanatham"
+        ],
+        "Telangana": [
+            "Adilabad",
+            "Bellampalle",
+            "Bhadrachalam",
+            "Bhainsa",
+            "Bhongir",
+            "Bodhan",
+            "Farooqnagar",
+            "Gadwal",
+            "Hyderabad",
+            "Jagtial",
+            "Jangaon",
+            "Kagaznagar",
+            "Kamareddy",
+            "Karimnagar",
+            "Khammam",
+            "Koratla",
+            "Kothagudem",
+            "Kyathampalle",
+            "Mahbubnagar",
+            "Mancherial",
+            "Mandamarri",
+            "Manuguru",
+            "Medak",
+            "Miryalaguda",
+            "Nagarkurnool",
+            "Narayanpet",
+            "Nirmal",
+            "Nizamabad",
+            "Palwancha",
+            "Ramagundam",
+            "Sadasivpet",
+            "Sangareddy",
+            "Siddipet",
+            "Sircilla",
+            "Suryapet",
+            "Tandur",
+            "Vikarabad",
+            "Wanaparthy",
+            "Warangal",
+            "Yellandu"
+        ],
+        "Tripura": [
+            "Agartala",
+            "Belonia",
+            "Dharmanagar",
+            "Kailasahar",
+            "Khowai",
+            "Pratapgarh",
+            "Udaipur"
+        ],
+        "Uttar Pradesh": [
+            "Achhnera",
+            "Agra",
+            "Aligarh",
+            "Allahabad",
+            "Amroha",
+            "Azamgarh",
+            "Bahraich",
+            "Chandausi",
+            "Etawah",
+            "Fatehpur Sikri",
+            "Firozabad",
+            "Hapur",
+            "Hardoi",
+            "Jhansi",
+            "Kalpi",
+            "Kanpur",
+            "Khair",
+            "Lal Gopalganj Nindaura",
+            "Lalganj",
+            "Lakhimpur",
+            "Lar",
+            "Lalitpur",
+            "Laharpur",
+            "Loni",
+            "Lucknow",
+            "Mathura",
+            "Meerut",
+            "Mirzapur",
+            "Modinagar",
+            "Moradabad",
+            "Nagina",
+            "Najibabad",
+            "Nakur",
+            "Nanpara",
+            "Naraura",
+            "Nautanwa",
+            "Nawabganj",
+            "Nehtaur",
+            "Niwai",
+            "Noida",
+            "Noorpur",
+            "Obra",
+            "Orai",
+            "Padrauna",
+            "Palia Kalan",
+            "Parasi",
+            "Phulpur",
+            "Pihani",
+            "Pilkhuwa",
+            "Pilibhit",
+            "Powayan",
+            "Pukhrayan",
+            "Puranpur",
+            "PurqUrban Agglomerationzi",
+            "Purwa",
+            "Rae Bareli",
+            "Rampur",
+            "Rampur Maniharan",
+            "Rasra",
+            "Rath",
+            "Renukoot",
+            "Reoti",
+            "Robertsganj",
+            "Rudauli",
+            "Rudrapur",
+            "Sadabad",
+            "Saharanpur",
+            "Sahaspur",
+            "Sahawar",
+            "Sahjanwa",
+            "Saidpur",
+            "Sandi",
+            "Sandila",
+            "Samdhan",
+            "Sambhal",
+            "Sardhana",
+            "Sahaswan",
+            "Seohara",
+            "Shahabad, Hardoi",
+            "Shahabad, Rampur",
+            "Shahganj",
+            "Shahjahanpur",
+            "Shamli",
+            "Shamsabad, Agra",
+            "Shamsabad, Farrukhabad",
+            "Sherkot",
+            "Shikarpur, Bulandshahr",
+            "Shikohabad",
+            "Shishgarh",
+            "Siana",
+            "Sikandra Rao",
+            "Sikanderpur",
+            "Sikandrabad",
+            "Sirsi",
+            "Sirsaganj",
+            "Sitapur",
+            "Soron",
+            "SUrban Agglomerationr",
+            "Sultanpur",
+            "Sumerpur",
+            "Tanda",
+            "Thakurdwara",
+            "Thana Bhawan",
+            "Tilhar",
+            "Tirwaganj",
+            "Tundla",
+            "Tulsipur",
+            "Ujhani",
+            "Unnao",
+            "Utraula",
+            "Varanasi",
+            "Vrindavan",
+            "Warhapur",
+            "Zaidpur",
+            "Zamania"
+        ],
+        "Uttarakhand": [
+            "Bageshwar",
+            "Dehradun",
+            "Haldwani-cum-Kathgodam",
+            "Hardwar",
+            "Kashipur",
+            "Manglaur",
+            "Mussoorie",
+            "Nagla",
+            "Nainital",
+            "Pauri",
+            "Pithoragarh",
+            "Ramnagar",
+            "Rishikesh",
+            "Roorkee",
+            "Rudrapur",
+            "Sitarganj",
+            "Srinagar",
+            "Tehri"
+        ],
+        "West Bengal": [
+            "Adra",
+            "AlipurdUrban Agglomerationr",
+            "Arambagh",
+            "Asansol",
+            "Baharampur",
+            "Balurghat",
+            "Bankura",
+            "Darjiling",
+            "English Bazar",
+            "Gangarampur",
+            "Habra",
+            "Hugli-Chinsurah",
+            "Jalpaiguri",
+            "Jhargram",
+            "Kalimpong",
+            "Kharagpur",
+            "Kolkata",
+            "Mainaguri",
+            "Malda",
+            "Mathabhanga",
+            "Medinipur",
+            "Memari",
+            "Monoharpur",
+            "Murshidabad",
+            "Nabadwip",
+            "Naihati",
+            "Panchla",
+            "PandUrban Agglomeration",
+            "Paschim Punropara",
+            "Purulia",
+            "Raghunathganj",
+            "Raghunathpur",
+            "Raiganj",
+            "Rampurhat",
+            "Ranaghat",
+            "Sainthia",
+            "Santipur",
+            "Siliguri",
+            "Sonamukhi",
+            "Srirampore",
+            "Suri",
+            "Taki",
+            "Tamluk",
+            "Tarakeswar"
+        ]
+    };
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof $ === 'undefined') {
+            console.error('jQuery is not loaded yet!');
+            return;
+        }
+
+        const stateSelect = $('#state');
+        const citySelect = $('#city');
+
+        // Initialize Select2
+        stateSelect.select2({
+            placeholder: "Select State",
+            width: '100%',
+            minimumResultsForSearch: 0
+        });
+
+        citySelect.select2({
+            placeholder: "Select City",
+            width: '100%',
+            minimumResultsForSearch: 0
+        });
+
+        // Populate State dropdown
+        Object.keys(stateCityMap).forEach(function(state) {
+            const option = new Option(state, state);
+            stateSelect.append(option);
+        });
+
+        // Populate City dropdown when State changes
+        stateSelect.on('change', function() {
+            const cities = stateCityMap[this.value] || [];
+            citySelect.empty().append(new Option("Select City", ""));
+
+            cities.forEach(function(city) {
+                const option = new Option(city, city);
+                citySelect.append(option);
+            });
+
+            citySelect.trigger('change.select2'); // Refresh Select2
+        });
+
+        // Trigger once on page load if state already selected
+        // if (selectedState) {
+        //     stateSelect.trigger('change');
+        // }
+    });
+</script>
 <script>
     $(function() {
         $('[data-toggle="tooltip"]').tooltip({
@@ -239,8 +2240,73 @@
         });
     });
 </script>
+<noscript id="deferred-styles">
+    <link rel="stylesheet" href="{{ URL::to('/asset/css/owl.carousel.min.css') }}">
+</noscript>
+<script>
+    const loadDeferredStyles = () => {
+        const addStyles = document.getElementById("deferred-styles");
+        const div = document.createElement("div");
+        div.innerHTML = addStyles.textContent;
+        document.body.appendChild(div);
+        addStyles.remove();
+    };
+    window.requestAnimationFrame ?
+        requestAnimationFrame(() => setTimeout(loadDeferredStyles, 0)) :
+        window.addEventListener("load", loadDeferredStyles);
+</script>
+<script>
+    navigator.brave?.isBrave?.().then(function(result) {
+        console.log("Is Brave:", result);
+        $("#is_brave").val(result ? 1 : 0); // Convert true/false to 1/0 if needed
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const lazyImages = document.querySelectorAll("img.lazy");
+        const lazyVideos = document.querySelectorAll("video[data-lazy='true']");
 
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
 
+                    // Lazy Load Image
+                    if (el.tagName.toLowerCase() === "img" && el.dataset.src) {
+                        el.src = el.dataset.src;
+                        el.classList.remove("lazy");
+                        el.removeAttribute("data-src");
+                    }
+
+                    // Lazy Load Video
+                    if (el.tagName.toLowerCase() === "video") {
+                        let hasLazySource = false;
+                        el.querySelectorAll("source").forEach(source => {
+                            if (source.dataset.src) {
+                                source.src = source.dataset.src;
+                                source.removeAttribute("data-src");
+                                hasLazySource = true;
+                            }
+                        });
+
+                        if (hasLazySource) {
+                            el.load();
+                            el.play().catch(() => {});
+                            el.removeAttribute("data-lazy");
+                        }
+                    }
+
+                    observer.unobserve(el);
+                }
+            });
+        }, {
+            threshold: 0.25
+        }); // when 25% visible
+
+        lazyImages.forEach(img => observer.observe(img));
+        lazyVideos.forEach(video => observer.observe(video));
+    });
+</script>
 @yield('scripts')
 </body>
 

@@ -1,46 +1,65 @@
-<section id="section-home-newdes" class="{{$class}}">
+﻿<section id="section-home-newdes" class="{{ $class }}" loading="lazy">
     <div class="home-newdes-section">
         <div class="home-newdes-section-container">
             <div class="container-fluid">
+                @php
+                    $user = app('logged-in-user');
+                    $viewAllHref = !$user
+                        ? 'javascript:openSubscriptionModal()'
+                        : ($user->subscription !== 'Yes'
+                            ? 'javascript:openSubscriptionModal()'
+                            : $viewall_route);
+                @endphp
                 <div class="homepage-heading d-flex justify-content-between align-items-center pe-3">
-                    <span class="l-head">{{ $title }} {{isset($sub_title) ? '-'. $sub_title : ''}}</span>
-                    <a href="{{ $viewall_route }}" class="l-sub-head text-white text-decoration-none">
-                        View All
-                        >
+                    <span class="l-head">{{ $title }} {{ isset($sub_title) ? '-' . $sub_title : '' }}</span>
+                    <a href="{{ $viewAllHref }}" class="l-sub-head text-white text-decoration-none">
+                        View All >
                     </a>
                 </div>
                 <div class="slider-container">
                     <div class="latest-release-slider owl-carousel owl-theme" id="{{ $id }}">
                         @foreach ($data as $d)
+                            @php
+                                $dedicatedUrl = route($view_route, [
+                                    'id' => App\Helpers\VideoHelper::encryptID($d->id),
+                                ]);
+                                $watchHref = !$user
+                                    ? 'javascript:openSubscriptionModal()'
+                                    : ($user->subscription !== 'Yes'
+                                        ? 'javascript:openSubscriptionModal()'
+                                        : $dedicatedUrl);
+                            @endphp
                             <div class="item">
                                 <div class="cards-container">
                                     <div class="alpha-card skeleton">
                                         <div class="image-wrapper">
-                                            <a href="{{ route($view_route, ['id' => \App\Helpers\VideoHelper::encryptID($d->id)]) }}">
-                                                <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $d->landscape }}"
-                                                    alt="">
+                                            <a href="{{ $watchHref }}">
+                                                <img class="lazyload"
+                                                    src="{{ config('app.website_url') }}admin_panel/public/images/video/{{ $d->landscape }}"
+                                                    alt="{{ $d->landscape }}" loading="lazy">
                                             </a>
                                         </div>
                                         <div class="alpha-card-large {{ $d->trailer_url ? 'movie-card' : '' }}"
                                             id="movie-card">
-                                            <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $d->landscape }}"
-                                                class="thumbnail" id="thumbnail" alt="">
-                                            <video class="video-holder" loop muted id="video-holder">
-                                                <source src="{{ $d->trailer_url }}" type="video/mp4">
-                                            </video>
+                                            <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{ $d->landscape }}"
+                                                class="thumbnail lazyload" id="thumbnail" alt="{{ $d->landscape }}"
+                                                loading="lazy">
                                             <div class="content-holder">
-                                                {{-- <img src="{{url('/')}}/asset/images/tere-sang.png" class="title mt-5" alt=""> --}}
                                                 <div class="content">
                                                     <div class="button-holder row">
                                                         <div class="col-9">
-                                                            <a href="{{ route($view_route, ['id' => \App\Helpers\VideoHelper::encryptID($d->id)]) }}">
+                                                            <a href="{{ $watchHref }}">
                                                                 <button class="btn-watchnow" type="button">
                                                                     <i class="fa-solid fa-play"></i>&nbsp;&nbsp;
-                                                                    Watch Now</button></a>
+                                                                    Watch Now
+                                                                </button>
+                                                            </a>
                                                         </div>
-                                                        <div class="col-3">
+                                                        <div class="col-3 ps-0">
                                                             @include('watchlist-button', [
                                                                 'id' => $d->id,
+                                                                'type_id' => $d->type_id,
+                                                                'category_id' => $d->category_id,
                                                                 'type' => 'video',
                                                                 'watchlist' => $watchlist,
                                                             ])
@@ -58,7 +77,7 @@
                                                             @endif
                                                         </li>
                                                         <li>&#x2022;</li>
-                                                        <li> {{ $d->language_name }}</li>
+                                                        <li>{{ $d->language->name }}</li>
                                                     </ul>
                                                     <p class="mt-1 mb2 animate__animated animate__fadeInUp">
                                                         {{ Str::words(strip_tags($d->description), 15, '...') }}

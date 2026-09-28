@@ -1,4 +1,4 @@
-@extends('layouts.main')
+﻿@extends('layouts.main')
 @section('main-section')
 {{-- <div id="page-loader" style="display: none;">
     <img src="{{url('/')}}/asset/images/loader.gif" alt="Loading...">
@@ -11,8 +11,8 @@
         <section id="banners" class="banner-section-main-class">
             <div class="banner-section">
                 <div id="movie-banner" class="owl-carousel owl-theme" >
-                    <div class="item"  data-bg-desktop="https://alphastudioz.in/admin_panel/public/images/video/651734103865.jpg" 
-                    data-bg-mobile="https://alphastudioz.in/admin_panel/public/images/video/741734104221.jpg">
+                    <div class="item"  data-bg-desktop="{{ config('app.website_url') }}admin_panel/public/images/video/651734103865.jpg" 
+                    data-bg-mobile="{{ config('app.website_url') }}admin_panel/public/images/video/741734104221.jpg">
                        <div class="carousel-caption d-md-block overlay">
                         <div class="movie-short-description">
                             <div class="row">
@@ -27,7 +27,7 @@
                                        </ul>
                                       
                                        <div class="d-flex position-relative mt-3">
-                                        <a href="https://alphastudioz.in/podcast/view/167/watch=true">     <button type="button" class="btn-common">
+                                        <a href="{{ config('app.website_url') }}podcast/view/167/watch=true">     <button type="button" class="btn-common">
                                                 <i class="icon-play"></i>Watch Now
                                             </button>
                                         </a>
@@ -89,11 +89,11 @@
                                         <div class="movie-card">
                                             <div class="image-container">
                                                 @if($item['type'] === 'video')
-                                            <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $entity->thumbnail }}" class="card-img-top thumbnail" alt="..." id="image">    
-                                            <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $entity->landscape }}" class="card-img-top landscape" alt="..." id="image">
+                                            <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{ $entity->thumbnail }}" class="card-img-top thumbnail" alt="..." id="image">    
+                                            <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{ $entity->landscape }}" class="card-img-top landscape" alt="..." id="image">
                                         @else
-                                            <img src="https://alphastudioz.in/admin_panel/public/images/series/{{ $entity->thumbnail }}" class="card-img-top thumbnail" alt="..." id="image">    
-                                            <img src="https://alphastudioz.in/admin_panel/public/images/series/{{ $entity->landscape }}" class="card-img-top landscape" alt="..." id="image">
+                                            <img src="{{ config('app.website_url') }}admin_panel/public/images/series/{{ $entity->thumbnail }}" class="card-img-top thumbnail" alt="..." id="image">    
+                                            <img src="{{ config('app.website_url') }}admin_panel/public/images/series/{{ $entity->landscape }}" class="card-img-top landscape" alt="..." id="image">
                                         @endif   
                                             </div>
                                             <div class="card-body">
@@ -213,8 +213,8 @@
                                   <a href="{{ route('view.details', ['id' => $trailer->id]) }}">
                                   <div class="movie-card" aria-hidden="true">
                                       <div class="image-container">
-                                          <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$trailer->thumbnail}}" class="card-img-top thumbnail placeholder-glow" alt="..." id="image">    
-                                          <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$trailer->landscape}}" class="card-img-top landscape placeholder-glow" alt="..." id="image">    
+                                          <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$trailer->thumbnail}}" class="card-img-top thumbnail placeholder-glow" alt="..." id="image">    
+                                          <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$trailer->landscape}}" class="card-img-top landscape placeholder-glow" alt="..." id="image">    
                                         
                                           
                                       </div>
@@ -304,8 +304,8 @@
                                   <a href="{{ route('view.details', ['id' => $upcomming->id]) }}">
                                   <div class="movie-card" >
                                       <div class="image-container" aria-hidden="true">
-                                          <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$upcomming->thumbnail}}" class="card-img-top thumbnail placeholder-glow" alt="..." id="image">    
-                                          <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$upcomming->landscape}}" class="card-img-top landscape placeholder-glow" alt="..." id="image">    
+                                          <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$upcomming->thumbnail}}" class="card-img-top thumbnail placeholder-glow" alt="..." id="image">    
+                                          <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$upcomming->landscape}}" class="card-img-top landscape placeholder-glow" alt="..." id="image">    
                                         
                                           
                                       </div>
@@ -394,8 +394,8 @@
                                   <a href="{{ route('view.details', ['id' => $podcast->id]) }}">
                                   <div class="movie-card">
                                       <div class="image-container">
-                                          <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$podcast->thumbnail}}" class="card-img-top thumbnail" alt="..." id="image">    
-                                          <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$podcast->landscape}}" class="card-img-top landscape" alt="..." id="image">    
+                                          <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$podcast->thumbnail}}" class="card-img-top thumbnail" alt="..." id="image">    
+                                          <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$podcast->landscape}}" class="card-img-top landscape" alt="..." id="image">    
                                         
                                           
                                       </div>
@@ -485,8 +485,8 @@
                                   <a href="{{ route('view.details', ['id' => $romance->id]) }}">
                                       <div class="movie-card">
                                           <div class="image-container">
-                                              <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$romance->thumbnail}}" class="card-img-top thumbnail" alt="..." id="image">    
-                                              <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$romance->landscape}}" class="card-img-top landscape" alt="..." id="image">    
+                                              <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$romance->thumbnail}}" class="card-img-top thumbnail" alt="..." id="image">    
+                                              <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$romance->landscape}}" class="card-img-top landscape" alt="..." id="image">    
                                             
                                               
                                           </div>
@@ -575,8 +575,8 @@
                                   <a href="{{ route('view.details', ['id' => $action->id]) }}">
                                       <div class="movie-card">
                                           <div class="image-container">
-                                              <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$action->thumbnail}}" class="card-img-top thumbnail" alt="..." id="image">    
-                                              <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$action->landscape}}" class="card-img-top landscape" alt="..." id="image">    
+                                              <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$action->thumbnail}}" class="card-img-top thumbnail" alt="..." id="image">    
+                                              <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$action->landscape}}" class="card-img-top landscape" alt="..." id="image">    
                                             
                                               
                                           </div>
@@ -663,8 +663,8 @@
                                   <a href="{{ route('view.details', ['id' => $thrill->id]) }}">
                                       <div class="movie-card">
                                           <div class="image-container">
-                                              <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$thrill->thumbnail}}" class="card-img-top thumbnail" alt="..." id="image">    
-                                              <img src="https://alphastudioz.in/admin_panel/public/images/video/{{$thrill->landscape}}" class="card-img-top landscape" alt="..." id="image">    
+                                              <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$thrill->thumbnail}}" class="card-img-top thumbnail" alt="..." id="image">    
+                                              <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{$thrill->landscape}}" class="card-img-top landscape" alt="..." id="image">    
                                             
                                               
                                           </div>

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Season;
+use App\Models\Episodes;
 
 class Series extends Model
 {
@@ -27,4 +29,8 @@ class Series extends Model
     {
         return $this->hasMany(Season::class);
     }
+    public function episodes()
+{
+    return $this->hasMany(Episodes::class, 'series_id');
+}
 }

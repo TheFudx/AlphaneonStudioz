@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Sports Register
+    {{ config('app.project_name') }} | Sports Register
 @endsection
 @section('main-section')
 <div class="row ms-0 me-0">

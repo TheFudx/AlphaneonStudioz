@@ -2,8 +2,8 @@
 @section('content')
 <div class="login-part">
     <div class="container" id="container"> 
-       <a href="{{url('/')}}"><img src="{{url('/')}}/asset/icons/logo.png" class="img-fluid main-logo d-sm-block d-none" id="main-logo" alt=""></a> 
-       <a href="{{url('/')}}"><img src="{{url('/')}}/asset/icons/logo.png" class="img-fluid main-logo d-sm-none d-block"  alt=""></a> 
+       <a href="{{url('/')}}"><img src="{{url('/')}}/asset/icons/logo.png" class="img-fluid main-logo d-sm-block d-none" id="main-logo" alt="logo.png" loading="lazy"></a> 
+       <a href="{{url('/')}}"><img src="{{url('/')}}/asset/icons/logo.png" class="img-fluid main-logo d-sm-none d-block"  alt="logo.png" loading="lazy"></a> 
         <div class="form-container sign-up-container">
             <form method="POST" action="{{ route('register') }}">
                 @csrf
@@ -108,13 +108,13 @@
                     <div class="overlay-panel overlay-left">
                         <h1>Welcome !</h1>
                         <p>"Unleash Your Cinematic Journey: Explore, Watch, Repeat."</p>
-                        <img src="{{url('/')}}/asset/images/Login-creative.png" class="img-fluid" alt="">
+                        <img src="{{url('/')}}/asset/images/Login-creative.png" class="img-fluid" alt="Login-creative.png" loading="lazy">
                         <button class="ghost" id="signIn">Login</button>
                     </div>
                     <div class="overlay-panel overlay-right">
                         <h1>Welcome Back!</h1>
                         <p>"Unleash Your Cinematic Journey: Explore, Watch, Repeat."</p>
-                        <img src="{{url('/')}}/asset/images/Login-creative.png" class="img-fluid" alt="">
+                        <img src="{{url('/')}}/asset/images/Login-creative.png" class="img-fluid" alt="Login-creative.png" loading="lazy">
                         <button class="ghost" id="signUp">Register</button>
                     </div>
                 </div>

@@ -24,7 +24,7 @@ class SubscriptionTestController extends Controller
         $watchlist = app('wishlist');
         session(['watchlist' => $watchlist]);
     
-        $package = Package::all();
+        $package = Package::where('status', 1)->get();
         // $package = Package::join('transaction','transaction.package_id', '=', 'package.id')
         // ->where('transaction.user_id', $user->id)
         // ->get();
@@ -63,7 +63,7 @@ class SubscriptionTestController extends Controller
         $watchlist = app('wishlist');
         session(['watchlist' => $watchlist]);
     
-        $package = Package::all();
+        $package = Package::where('status', 1)->get();
         // $package = Package::join('transaction','transaction.package_id', '=', 'package.id')
         // ->where('transaction.user_id', $user->id)
         // ->get();
@@ -103,7 +103,7 @@ class SubscriptionTestController extends Controller
         $watchlist = app('wishlist');
         session(['watchlist' => $watchlist]);
     
-        $package = Package::all();
+        $package = Package::where('status', 1)->get();
         $typeId = $package->pluck('type_id')->toArray();
         $typeData = Type::whereIn('id', $typeId)->get();
         

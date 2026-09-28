@@ -26,7 +26,7 @@
     </div>
     <script>
         $(document).ready(function() {
-            fetch("https://alphastudioz.in/public/flutter-app/user/series_banner-test.php")
+            fetch(window.location.origin + "/public/flutter-app/user/series_banner-test.php")
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === "success" && data.data.length > 0) {

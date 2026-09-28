@@ -19,7 +19,7 @@
                 <img src="{{ asset('storage/profile_pictures/' . app('logged-in-user')->profile_picture) }}"
                     alt="User Avatar" class="h-9 w-9 rounded-full border-2 border-theme">
             @else
-                <img src="https://placehold.co/36x36/6B46C1/FFFFFF?text={{ app('logged-in-user')->email ? strtoupper(substr(app('logged-in-user')->email, 0, 1)) : strtoupper(substr(app('logged-in-user')->name, 0, 1)) }}"
+                <img src="https://placehold.co/36x36/FF3A1F/FFFFFF?text={{ app('logged-in-user')->email ? strtoupper(substr(app('logged-in-user')->email, 0, 1)) : strtoupper(substr(app('logged-in-user')->name, 0, 1)) }}"
                     alt="User Avatar" class="h-9 w-9 rounded-full border-2 border-theme">
             @endif
             <span class="font-semibold text-sm hidden sm:block">{{ app('logged-in-user')->name }}</span>

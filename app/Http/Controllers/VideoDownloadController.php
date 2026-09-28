@@ -23,6 +23,16 @@ class VideoDownloadController extends Controller
 
         return view('downloded-videos', compact('userDownloads'));
     }
+    public function downlodedVideosTest(){
+       
+        $userDownloads = UserDownloads::join('video','video.id','=','user_downloads.video_id')
+                            ->where('user_downloads.user_id', auth()->id())
+            ->orderBy('user_downloads.created_at', 'desc')
+            ->get();
+
+
+        return view('offline-video-list', compact('userDownloads'));
+    }
     public function deleteDownloadFromDatabase(Request $request, $downloadId)
     {
         if (!Auth::check()) {

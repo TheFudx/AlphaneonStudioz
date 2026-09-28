@@ -37,22 +37,21 @@ class ForgotPasswordController extends Controller
        
         $otp = rand(1000,9999);
         if($user){
-            if($user->type != 5){
-                return response()->json([
-                'status'=>404,
-                'message'=> 'Please try with your gmail account'
-            ]);
-            }
+            // if($user->type != 5){
+            //     return response()->json([
+            //     'status'=>404,
+            //     'message'=> 'Please try with your gmail account'
+            // ]);
+            // }
             // Mail::send('otp', ['otp' => $otp,'user'=>$user], function ($message) use ($request) {
             //     $message->to($request->input('email'))->subject('Your OTP');
             // });
-             $mail = new PHPMailer(true);
+            $mail = new PHPMailer(true);
             try {
-                    //Server settings
-                    
+                    //Server settings                    
                     $mail->isSMTP();
                     $mail->Host       = 'mail.alphastudioz.in'; // Set the SMTP server to send through
-                    $mail->SMTPAuth   = true;
+                    $mail->SMTPAuth   =  true;
                     $mail->Username   = 'info@alphastudioz.in';
                     $mail->Password   = 'Info#alpha@123';
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
@@ -65,8 +64,8 @@ class ForgotPasswordController extends Controller
                             ],
                         ];
                     //Recipients
-                    $mail->setFrom('info@alphastudioz.in', 'Alphastudioz IT Media Pvt Ltd ');
-                    $mail->addAddress($user->email != null ? $user->email : $user->username, 'Alpha Stdudioz');
+                    $mail->setFrom('info@alphastudioz.in', config('app.project_name'));
+                    $mail->addAddress($user->email != null ? $user->email : $user->username, config('app.project_full_name'));
                     // Content
                     $mail->isHTML(true);
                     $mail->Subject = 'OTP for Forgot Password';
@@ -95,15 +94,15 @@ class ForgotPasswordController extends Controller
                     }
                     $res =  ['user_id'=>$user->id,'otp'=>$otp,'user_otp_id'=>$user_otp_id];
                     return response()->json(['status'=> true,'message'=> 'OTP send successfully on email','data'=>$res ]);
-                } catch (Exception $e) {
+            } catch (Exception $e) {
                     return response()->json([
                         'status'=>false,
                         'message'=> 'Message could not be sent. Mailer Error:'.$mail->ErrorInfo
                     ]);
-                }
+            }
            
         }else{
-            return response()->json([ 'status'=>false,'message'=> 'User not found']);
+            return response()->json([ 'status'=>false,'message'=> 'This email address is not registered with us. Please check your email or log in using OTP.']);
         }
     }
     public function verifyOtp(Request $request){
@@ -145,26 +144,37 @@ class ForgotPasswordController extends Controller
         
         $data = $request->all();
         $rules = [
-            'user_id'=>'required',
-            'password' => 'required|min:8',
-            'password_confirmation' => 'required|min:8|same:password',
+            'user_id' => 'required',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',      // must contain at least one lowercase letter
+                'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                'regex:/[0-9]/',      // must contain at least one number
+                'regex:/[@$!%*#?&]/', // must contain at least one special character
+            ],
+            'password_confirmation' => 'required|same:password',
         ];
-        $validator = Validator::make($data, $rules);
+        $messages = [
+            'password.required'              => 'Please enter a new password.',
+            'password.min'                 => 'Password must be at least 8 characters long.',
+            'password.regex'               => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&).',
+            'password_confirmation.required' => 'Please confirm your new password.',
+            'password_confirmation.same'     => 'Confirm password does not match.',
+        ];
+        $validator = Validator::make($data, $rules, $messages);
         if($validator->fails()){
             return response()->json(['status'=>false,"message"=> $validator->errors()->first()]);
         }
         $user = User::where('id',$data['user_id'])->first();
-       
-        // if ($data['current_password'] && !Hash::check($data['current_password'], $user->password)) {
-        //     return response()->json([
-        //         'status'=>0,
-        //         'message'=>"The provided password does not match your current password."
-        //     ]);
-        // }
-    
+        if(!$user){
+            return response()->json(['status'=>false, 'message'=>'User not found']);
+        }
+
         // Update the user's password
         $user->password = Hash::make($data['password']);
         $user->save();
-        return response()->json(['status'=>true,"url"=> url('/profile')]);
+        return response()->json(['status'=>true,"message"=> "Password reset successfully.", "url"=> url('/profile/view')]);
     }
 }

@@ -94,4 +94,3 @@ echo json_encode([
 ]);
 
 mysqli_close($connectNow);
-?>

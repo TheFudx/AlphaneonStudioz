@@ -3,7 +3,7 @@
 @section('content')
 <div class="login-part">
     <div class="container" id="container"> 
-        <img src="{{url('/')}}/asset/icons/alpha-og.png" class="img-fluid main-logo" id="main-logo" alt="">
+        <img src="{{url('/')}}/asset/icons/alpha-og.png" class="img-fluid main-logo" id="main-logo" alt="alpha-og.png">
         <div class="form-container sign-up-container">
             <form method="POST" action="{{ route('register') }}">
                 @csrf

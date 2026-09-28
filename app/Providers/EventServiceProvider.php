@@ -26,6 +26,9 @@ class EventServiceProvider extends ServiceProvider
         'Illuminate\Auth\Events\Authenticated' => [
             'App\Listeners\LogDeviceInformation',
         ],
+        \SocialiteProviders\Manager\SocialiteWasCalled::class => [
+            \SocialiteProviders\Apple\AppleExtendSocialite::class . '@handle',
+        ],
     ];
 
     /**

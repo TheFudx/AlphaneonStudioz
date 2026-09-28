@@ -11,6 +11,7 @@ $payload = isset($data['payload']) ? $data['payload'] : null;
 $last_activity = isset($data['last_activity']) ? $data['last_activity'] : null;
 
 $subscription = 'Yes';
+$newSubscription = 'No';
 $userType = 5;
 $emailType = 2;
 
@@ -75,8 +76,8 @@ if (
     $deviceCountnum =  $deviceCountResult->fetch_assoc()['total'];
 
     // Current Plan
-    $subQuery = $connectNow->prepare("SELECT package_id FROM user_subscriptions WHERE user_id = ? AND razorpay_subscription_id = ? AND status = ?");
-    $subQuery->bind_param("isi", $userID, $razorSubsId,1);
+    $subQuery = $connectNow->prepare("SELECT package_id FROM user_subscriptions WHERE user_id = ? AND razorpay_subscription_id = ?");
+    $subQuery->bind_param("is", $userID, $razorSubsId);
     $subQuery->execute();
     $subResult = $subQuery->get_result();
     $subResultRow = $subResult->fetch_assoc();
@@ -167,6 +168,7 @@ if (($result2 && $result2->num_rows > 0)) {
         "message" => "Login successful",
         "userId" => $userID,
         "session_id" => $session_id,
+        "subscription" => $newSubscription,
         "device_id" => $device_id,
     ]);
     $connectNow->close();
@@ -193,7 +195,7 @@ echo json_encode([
     "status" => "success",
     "message" => "Registration successful",
     "userId" => $newUserId,
-    "subscription" => $subscription,
+    "subscription" => $newSubscription,
     "session_id" => $session_id,
     "device_id" => $device_id,
 ]);

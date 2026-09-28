@@ -1,18 +1,16 @@
 <?php
 include 'database.php';
-$data = json_decode(
-    file_get_contents('php://input'),
-    true
-);
+header('Content-Type: application/json'); // Set response header to JSON
+$data = json_decode(file_get_contents('php://input'), true);
 
 function getOrNull($array, $key)
 {
     return isset($array[$key]) && $array[$key] !== '' ? $array[$key] : null;
 }
 
-$userId = getOrNull($data, 'user_id');
-$packageId = getOrNull($data, 'package_id');
-$razorpayId =  getOrNull($data, 'razorpay_subscription_id');
+$userId = $data['user_id'] ?? null;
+$packageId = $data['package_id'] ?? null;
+$razorpayId =  $data['razorpay_subscription_id'] ?? null;
 $created_at = date('Y-m-d H:i:s');
 $updated_at = date('Y-m-d H:i:s');
 
@@ -40,10 +38,10 @@ if ($userId !== null && $packageId !== null && $razorpayId === null) {
     }
 } else {
 
-    $sql = "INSERT INTO user_subscriptions (user_id, package_id, razorpay_subscription_id, created_at, updated_at, status) VALUES (?,?,?,?,?)";
+    $sql = "INSERT INTO user_subscriptions (user_id, package_id, razorpay_subscription_id, created_at, updated_at) VALUES (?,?,?,?,?)";
 
     $stmt = mysqli_prepare($connectNow, $sql);
-    mysqli_stmt_bind_param($stmt, "iisssi", $userId, $packageId, $razorpayId, $created_at, $updated_at,0);
+    mysqli_stmt_bind_param($stmt, "iisss", $userId, $packageId, $razorpayId, $created_at, $updated_at);
 
     if (mysqli_stmt_execute($stmt)) {
         echo json_encode(["status" => "success", "message" => "Subscription updated"]);

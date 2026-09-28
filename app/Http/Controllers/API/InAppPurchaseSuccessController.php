@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Transction;
 use App\Models\UserSubscription;
 use Log;
+use Http;
 
 class InAppPurchaseSuccessController extends Controller
 {
@@ -154,35 +155,117 @@ class InAppPurchaseSuccessController extends Controller
         ]);
     }
 
-    public function handleWebhook(Request $request)
-    {
-        Log::info('Apple IAP Webhook:', $request->all());
+    public function handleIOSWebhook(Request $request)
+    {   
+        Log::info('------------------------------Apple webhook started------------------------------');
+        Log::info('Apple IAP Webhook Received:', $request->all());
 
         $notificationType = $request->input('notification_type');
-        $receiptInfo = $request->input('unified_receipt.latest_receipt_info')[0] ?? null;
+        $latestInfo = $request->input('unified_receipt.latest_receipt_info')[0] ?? null;
 
-        if (!$receiptInfo) {
+        if (!$latestInfo) {
             return response()->json(['error' => 'No receipt info found'], 400);
         }
 
-        $transactionId = $receiptInfo['transaction_id'];
-        $productId = $receiptInfo['product_id'];
-        $expiresDate = Carbon::createFromTimestampMs($receiptInfo['expires_date_ms']);
+        // Extract core fields from Apple payload
+        $transactionId         = $latestInfo['transaction_id'] ?? null;
+        $originalTransactionId = $latestInfo['original_transaction_id'] ?? null;
+        $productId             = $latestInfo['product_id'] ?? null;
+        $expiresAt             = isset($latestInfo['expires_date_ms']) 
+                                    ? \Carbon\Carbon::createFromTimestampMs($latestInfo['expires_date_ms']) 
+                                    : null;
+        $purchasedAt           = isset($latestInfo['purchase_date_ms']) 
+                                    ? \Carbon\Carbon::createFromTimestampMs($latestInfo['purchase_date_ms']) 
+                                    : null;
+        $environment           = $request->input('environment', 'Unknown');
 
-        // Match user from your DB using transaction_id or other method
-        $transaction = Transction::where('payment_id', $transactionId)->where('status',1)->first();
+        // Find user by previous transaction (optional: add app_account_token mapping later)
+        $transaction = Transction::where('payment_id', $originalTransactionId)
+            ->orWhere('payment_id', $transactionId)
+            ->first();
 
-        if ($transaction && $transaction->user) {
-            $user = $transaction->user;
-
-            $user->subscription = 'Yes';
-            $user->subscription_end_date = $expiresDate->toDateString();
-            $user->save();
-
-            // Optionally log renewal
-            Log::info("Renewed subscription for user ID {$user->id} until {$expiresDate}");
+        $user = $transaction?->user;
+        if($latestInfo['product_id'] == 'base_mont_01') {
+            $packageId = 2; // Monthly
+        } elseif($latestInfo['product_id'] == 'base_year_01') {
+            $packageId = 3; // Yearly
+        } else {
+            return response()->json(['error' => 'Unknown product ID'], 400);
         }
+        // Upsert transaction
+        $newTransaction = Transction::updateOrCreate(
+            ['payment_id' => $transactionId],
+            [
+                'user_id'                 => optional($user)->id,
+                'package_id'              => $packageId,
+                'payment_id'              => $originalTransactionId,
+                'created_at'              => $purchasedAt,
+                'expiry_date'              => $expiresAt,
+                'status'                  => in_array($notificationType, ['INITIAL_BUY', 'DID_RENEW']) ? 1 : 0,
+            ]
+        );
+        Log::info('user latest info', $latestInfo);
 
+        // Update user subscription status (if user found)
+        if ($user) {
+            if (in_array($notificationType, ['INITIAL_BUY', 'DID_RENEW'])) {
+                $user->update([
+                    'is_subscribed' => true,
+                    'subscription_expires_at' => $expiresAt,
+                ]);
+            } elseif (in_array($notificationType, ['CANCEL', 'EXPIRED', 'DID_FAIL_TO_RENEW'])) {
+                $user->update([
+                    'is_subscribed' => false,
+                    'subscription_expires_at' => $expiresAt,
+                ]);
+            }
+
+            Log::info("Subscription updated for user ID {$user->id}, notification: $notificationType");
+        } else {
+            Log::warning("Webhook received but user not found for transaction_id: $transactionId");
+        }
+        Log::info('------------------------------Apple webhook ended------------------------------');
         return response()->json(['success' => true]);
+    }
+    public function verifyIOSReceipt(Request $request)
+    {
+        $receiptData = $request->input('receiptData'); // This must be base64-encoded
+        $sharedSecret = env('IOS_SERECT_KEY'); // Set this in .env
+        $response = Http::post('https://buy.itunes.apple.com/verifyReceipt', [
+            'receipt-data' => $receiptData,
+            'password' => $sharedSecret,
+            'exclude-old-transactions' => true,
+        ]);
+        $data = $response->json();
+        // Handle common errors
+        if ($data['status'] == 21007) {
+            // Receipt from sandbox, resend to sandbox URL
+            $response = Http::post('https://sandbox.itunes.apple.com/verifyReceipt', [
+                'receipt-data' => $receiptData,
+                'password' => $sharedSecret,
+                'exclude-old-transactions' => true,
+            ]);
+            $data = $response->json();
+        }
+        if ($data['status'] !== 0) {
+            return response()->json(['error' => 'Invalid receipt', 'code' => $data['status']], 400);
+        }
+        // Extract subscription info
+        $latestReceiptInfo = $data['latest_receipt_info'] ?? [];
+        $activeSubscriptions = [];
+        foreach ($latestReceiptInfo as $receipt) {
+            $expires = intval($receipt['expires_date_ms']);
+            if ($expires > now()->timestamp * 1000) {
+                $activeSubscriptions[] = [
+                    'product_id' => $receipt['product_id'],
+                    'transaction_id' => $receipt['original_transaction_id'],
+                    'expires_at' => $expires,
+                ];
+            }
+        }
+        return response()->json([
+            'active_subscriptions' => $activeSubscriptions,
+            'raw' => $data // optional: for debugging
+        ]);
     }
 }

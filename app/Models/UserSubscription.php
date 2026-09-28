@@ -12,10 +12,11 @@ class UserSubscription extends Model
 
     protected $fillable = [
         'user_id',
-        'payment_id',
         'razorpay_subscription_id',
         'package_id',
         'status',
+        'starts_at',
+        'ends_at',
     ];
 
     /**

@@ -15,7 +15,7 @@ return [
         'PODCAST' => 11,
         'COMEDYSHOW' => 12,
     ],
-    "PER_PAGE" => 48
+    "PER_PAGE" => 24
 ]
 
 ?>

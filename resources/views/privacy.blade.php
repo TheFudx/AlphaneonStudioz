@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Privacy & Policy
+    {{ config('app.project_name') }} | Privacy & Policy
 @endsection
 @section('main-section')
     <style>

@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Sports
+    {{ config('app.project_name') }} | Sports
 @endsection
 @section('main-section')
 <div class="row ms-0 me-0">
@@ -11,8 +11,8 @@
     <section id="banners" class="">
         <div class="banner-section">
             <div class="banner-holder d-block" >
-                <img src="{{url('/')}}/asset/images/arm-wrestling.png" class="inner-landscape" width="100%" alt="">
-                <img src="{{url('/')}}/asset/images/arm-wrestling-thumb.png" class="inner-thumbnail" width="100%" alt="">
+                <img src="{{url('/')}}/asset/images/arm-wrestling.png" class="inner-landscape" width="100%" alt="arm-wrestling.png">
+                <img src="{{url('/')}}/asset/images/arm-wrestling-thumb.png" class="inner-thumbnail" width="100%" alt="arm-wrestling-thumb.png">
                 <div class="overlay position-absolute">
                     <div class="movie-short-description ">
                         <div class="row">
@@ -197,9 +197,9 @@
                              <div class="pricing-container">
                                 <span class="ruleshead d-block mt-3 mb-3"> Pricing Details</span>
                                 <ul>
-                                    <li><img src="{{url('/')}}/asset/icons/first-price.png" height="25px" alt=""> 1st Price is ₹ 1,00,000 </li>
-                                    <li><img src="{{url('/')}}/asset/icons/scond-price.png" height="25px" alt=""> 2nd Price is ₹ 51,000 </li>
-                                    <li><img src="{{url('/')}}/asset/icons/third-price.png" height="25px" alt=""> 3rd Price is ₹ 11,000 </li>
+                                    <li><img src="{{url('/')}}/asset/icons/first-price.png" height="25px" alt="first-price.png"> 1st Price is ₹ 1,00,000 </li>
+                                    <li><img src="{{url('/')}}/asset/icons/scond-price.png" height="25px" alt="second-price.png"> 2nd Price is ₹ 51,000 </li>
+                                    <li><img src="{{url('/')}}/asset/icons/third-price.png" height="25px" alt="third-price.png"> 3rd Price is ₹ 11,000 </li>
                                 </ul>
                              </div>
                             </div>
@@ -251,7 +251,7 @@ document.getElementById('registrationForm').addEventListener('submit', function(
         "key": "rzp_test_FZs1ciE3h1febU",
         "amount": amount,
         "currency": "INR",
-        "name": "Alphastudioz",
+        "name": "{{ config('app.project_name') }}",
         "description": "Registration Fee",
         "handler": function (response){
             // Append payment ID to form

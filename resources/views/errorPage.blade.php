@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Thank you
+    {{ config('app.project_name') }} | Thank you
 @endsection
 @section('main-section')
     <section id="section-home-newdes" class="podcast mt-5 pt-5">
@@ -14,7 +14,7 @@
                         <div class="latest-release-slider movies-page-section">
                             <div class="row g-1">
                                 <div class="col-12 text-center">
-                                    {{-- <img src="{{ URL::to('asset/images/thankyou.png') }}" alt="Coming soon"
+                                    {{-- <img src="{{ URL::to('asset/images/thankyou.png') }}" alt="thankyou.png"
                                         class="img-fluid" style="max-width: 300px; margin-top: 10px;">
                                     <h3 class="text-white mt-3">Thankyou </h3> 
                                     <p class="text-white">Your ₹ {{$transaction->amount}} Subscription is Activated Enjoye Your entertainment</p> Descriptive text --}}

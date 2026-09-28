@@ -522,7 +522,7 @@ $(document).ready(function() {
         html += '<a href="' + getURL(result) + '">';
         html += '<div class="row">';
         // html += '<div class="col-3">';
-        // html += '<img src="https://alphastudioz.in/admin_panel/public/images/video/'+ result.thumbnail + '" height="100px" width="auto">';
+        // html += '<img src="' + window.WEBSITE_URL + 'admin_panel/public/images/video/'+ result.thumbnail + '" height="100px" width="auto">';
         // html += '</div>';
         html += '<div class="col-9">';
         html += '<h3>' + result.name + '</h3>'; 

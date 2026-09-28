@@ -115,8 +115,7 @@ class CheckDeviceLimit
                     
                         // For debugging or logging, you can inspect the current browser's User-Agent
                     $currentUserAgent = $request->header('User-Agent');
-                    Log::info("User {$user->id} current User-Agent: {$currentUserAgent}");
-                    Log::info("User {$user->id} device limit: {$deviceLimit}");
+                    // Log::info("UserID: {$user->id} Device limit: {$deviceLimit}  Current User-Agent: {$currentUserAgent}");
 
                     // If the active device count exceeds the limit, block access
                     if ($activeDevices > $deviceLimit) {

@@ -372,19 +372,19 @@ header .navbar .navbar-nav .nav-item .nav-link {
     border-radius: 50%;
     background-color: #555;
     font-weight: 600; */
-    width: 40px;
-    height: 40px;
-    background-color: #f44336;
-    color: white;
-    line-height: 22px;
-    border-radius: 50%;
+.user-header-avatar {
+    width: 40px !important;
+    height: 40px !important;
+    background-color: #f44336 !important;
+    color: #ffffff !important;
+    border-radius: 50% !important;
     font-size: 19px !important;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    display: inline-block;
-    text-align: center;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    line-height: 1 !important;
 }
 #new-banner-section .banner-section-coontainer .banner-section-holder {
   position: relative;

@@ -1,17 +1,49 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Webseries Show
+    {{ $meta_title ?? config('app.project_name') . '| Webseries Show' }}
 @endsection
 @section('main-section')
     @php
-        $user_subscription = app('logged-in-user')->subscription;
+        $user = app('logged-in-user');
     @endphp
+    <link rel="stylesheet" href="{{ URL::to('/asset/css/plyr.css') }}" media="print" onload="this.media='all'">
+    <script src="{{ url('/') }}/asset/js/plyr.js?v={{ time() }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        const resumeTime = {{ $lastWatchTime ?? 0 }};
+
+        function saveWatchTime(seconds) {
+
+            fetch("{{ route('save.watch.time') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({
+                        user_id: "{{ auth()->id() }}",
+                        video_id: "{{ $video->id }}",
+                        episode_id: "{{ $video->id }}",
+                        type_id: "{{ $video->type_id }}",
+                        series_id: "{{ $video->series_id }}",
+                        category_id: "{{ $video->category_id }}",
+                        watch_time: seconds,
+                        type: "episode"
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Watch time saved:", seconds);
+                })
+                .catch(err => console.error("Error saving watch time:", err));
+        }
+    </script>
+    @include('video-upload-type-common', ['video' => $video])
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const video = document.getElementById("transcodedplayer");
             const source =
-                'https://alphastudioz.in/admin_panel/public/storage/videos/{{ $video->transcoded_video_path }}/master.m3u8';
+                config('app.website_url') . 'admin_panel/public/storage/videos/{{ $video->transcoded_video_path }}/master.m3u8';
             const defaultOptions = {
                 controls: [
                     'play-large',
@@ -32,20 +64,56 @@
             if (Hls.isSupported()) {
                 const hls = new Hls();
                 hls.loadSource(source);
-                hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
-                    const availableQualities = hls.levels.map(level => level.height);
+                // hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
+                //     const availableQualities = hls.levels.map(level => level.height);
+                //     defaultOptions.quality = {
+                //         default: availableQualities[0],
+                //         options: availableQualities,
+                //         forced: true,
+                //         onChange: (e) => updateQuality(e),
+                //     };
+                //     const player = new Plyr(video, defaultOptions);
+                //     player.on('loadedmetadata', () => {
+                //         const totalSegments = Math.ceil(player.duration / thumbnailInterval);
+                //         addThumbnailPreview(player, totalSegments);
+                //     });
+                //     // Attach custom controls
+                //     addCustomControls(player);
+                // });
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+
+                    const availableQualities = hls.levels.map((l) => l.height);
+                    availableQualities.unshift(0);
+
                     defaultOptions.quality = {
-                        default: availableQualities[0],
+                        default: 0,
                         options: availableQualities,
                         forced: true,
-                        onChange: (e) => updateQuality(e),
+                        onChange: (newQuality) => updateQuality(newQuality),
                     };
+
                     const player = new Plyr(video, defaultOptions);
+
+                    let lastSentTime = 0;
+
+                    player.on('timeupdate', () => {
+
+                        const currentSec = Math.floor(player.currentTime);
+
+                        // Send every 5 seconds
+                        if (currentSec !== lastSentTime) {
+                            lastSentTime = currentSec;
+                            saveWatchTime(currentSec); // send every second
+                        }
+                    });
                     player.on('loadedmetadata', () => {
+                        if (resumeTime > 5) { // ensure it’s valid
+                            player.currentTime = resumeTime;
+                            console.log("Resumed at:", resumeTime);
+                        }
                         const totalSegments = Math.ceil(player.duration / thumbnailInterval);
                         addThumbnailPreview(player, totalSegments);
                     });
-                    // Attach custom controls
                     addCustomControls(player);
                 });
                 hls.attachMedia(video);
@@ -73,7 +141,7 @@
                     const offsetX = e.clientX - rect.left;
                     const segmentIndex = Math.floor((offsetX / progressBar.offsetWidth) * totalSegments);
                     const thumbnailUrl =
-                        `https://alphastudioz.in/admin_panel/public/storage/videos/{{ $video->transcoded_video_path }}/thumbnails/480p_thumbnail_${String(segmentIndex).padStart(3, '0')}.jpg`;
+                        `{{ config('app.website_url') }}admin_panel/public/storage/videos/{{ $video->transcoded_video_path }}/thumbnails/480p_thumbnail_${String(segmentIndex).padStart(3, '0')}.jpg`;
                     thumbnailPreview.src = thumbnailUrl;
                     const isFullscreen = !!document.fullscreenElement;
                     thumbnailPreview.style.left = `${e.pageX - (isFullscreen ? 70 : 70)}px`;
@@ -86,67 +154,121 @@
 
             function addCustomControls(player) {
                 const controlsContainer = player.elements.controls;
-                // Create Skip Intro button
-                //const skipIntroBtn = document.createElement('button');
-                //skipIntroBtn.classList.add('plyr__skip-intro-btn');
-                //skipIntroBtn.innerHTML = 'Skip Intro';
-                //skipIntroBtn.style.display = 'none'; // Initially hidden
-                //controlsContainer.appendChild(skipIntroBtn);
-                // Create countdown element
-                const countdown = document.createElement('p');
-                countdown.classList.add('plyr__countdown-text');
-                countdown.id = 'countdown';
-                countdown.innerHTML = 'Next episode will play in';
-                countdown.style.display = 'none';
-                controlsContainer.appendChild(countdown);
-                // Create Previous Episode button
+                const playerContainer = player.elements.container;
+
+                // Countdown overlay
+                const countdownOverlay = document.createElement('div');
+                countdownOverlay.id = 'countdownOverlay';
+                countdownOverlay.classList.add('plyr__countdown-overlay');
+                countdownOverlay.innerHTML = `
+                    <span class="up-next-label">Up Next</span>
+                    <span class="countdown-timer" id="countdown-timer-text"></span>
+                `;
+                playerContainer.appendChild(countdownOverlay);
+
+                // Previous Episode
                 if (typeof previousEpisodeUrl !== 'undefined') {
                     const prevEpisodeBtn = document.createElement('button');
                     prevEpisodeBtn.classList.add('plyr__prev-episode-btn');
                     prevEpisodeBtn.innerHTML = 'Previous Episode';
                     controlsContainer.appendChild(prevEpisodeBtn);
-                    prevEpisodeBtn.addEventListener('click', () => playEpisode(previousEpisodeUrl));
+                    prevEpisodeBtn.onclick = () => playEpisode(previousEpisodeUrl);
                 }
-                // Create Next Episode button
+
+                // Next Episode
                 if (typeof nextEpisodeUrl !== 'undefined') {
                     const nextEpisodeBtn = document.createElement('button');
                     nextEpisodeBtn.classList.add('plyr__next-episode-btn');
                     nextEpisodeBtn.innerHTML = 'Next Episode';
                     controlsContainer.appendChild(nextEpisodeBtn);
-                    nextEpisodeBtn.addEventListener('click', () => playEpisode(nextEpisodeUrl));
-                    // Countdown to next episode
+                    nextEpisodeBtn.onclick = () => playEpisode(nextEpisodeUrl);
+
+                    const timerText = document.getElementById('countdown-timer-text');
+
                     player.on('timeupdate', () => {
-                        const timeRemaining = player.duration - player.currentTime;
-                        if (timeRemaining <= 80) {
-                            nextEpisodeBtn.style.display = 'block';
-                            countdown.style.display = 'block';
-                            countdown.innerText =
-                                `Next episode will play in ${Math.floor(timeRemaining)} seconds`;
-                            if (timeRemaining <= 0) {
-                                playEpisode(nextEpisodeUrl);
-                            }
+                        const timeRemaining = Math.floor(player.duration - player.currentTime);
+
+                        if (timeRemaining <= 60 && timeRemaining > 0) {
+                            countdownOverlay.style.display = 'block';
+                            timerText.textContent = `Next video in ${timeRemaining}s`;
                         } else {
-                            countdown.style.display = 'none';
+                            countdownOverlay.style.display = 'none';
                         }
                     });
+
+                    player.on('ended', () => {
+                        playEpisode(nextEpisodeUrl);
+                    });
                 }
-                // Show Skip Intro button within a specific time range
-                const video = player.media;
-                const skipToTime = 390; // Time to skip to (e.g., 6 minutes 30 seconds)
-                const buttonVisibleAfter = 330; // Show the button after 5 minutes 30 seconds
-                video.addEventListener('timeupdate', () => {
-                    if (video.currentTime >= buttonVisibleAfter && video.currentTime < skipToTime) {
-                        skipIntroBtn.style.display = 'block';
+
+                // =========================
+                // ✅ CENTER SKIP CONTROLS
+                // =========================
+
+                const centerControls = document.createElement('div');
+                centerControls.classList.add('plyr__center-controls');
+
+                // LEFT (-10)
+                const leftSkip = document.createElement('div');
+                leftSkip.classList.add('plyr__center-skip');
+                leftSkip.innerHTML = `
+            <i class="fa-solid fa-angle-double-left"></i>
+            <span>10</span>
+            `;
+
+                    // RIGHT (+10)
+                    const rightSkip = document.createElement('div');
+                    rightSkip.classList.add('plyr__center-skip');
+                    rightSkip.innerHTML = `
+            <i class="fa-solid fa-angle-double-right"></i>
+            <span>10</span>
+            `;
+
+                centerControls.appendChild(leftSkip);
+                centerControls.appendChild(rightSkip);
+                playerContainer.appendChild(centerControls);
+
+                // Click
+                leftSkip.onclick = () => {
+                    player.currentTime = Math.max(player.currentTime - 10, 0);
+                };
+
+                rightSkip.onclick = () => {
+                    player.currentTime = Math.min(player.currentTime + 10, player.duration);
+                };
+
+                // =========================
+                // ✅ DOUBLE CLICK SUPPORT
+                // =========================
+
+                playerContainer.addEventListener('dblclick', (e) => {
+                    const rect = playerContainer.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+
+                    if (clickX < rect.width / 2) {
+                        player.currentTime = Math.max(player.currentTime - 10, 0);
+                        showSkip('left');
                     } else {
-                        skipIntroBtn.style.display = 'none';
+                        player.currentTime = Math.min(player.currentTime + 10, player.duration);
+                        showSkip('right');
                     }
                 });
-                // Skip Intro button click event
-                skipIntroBtn.addEventListener('click', () => {
-                    video.currentTime = skipToTime;
-                    player.play();
-                    skipIntroBtn.style.display = 'none';
-                });
+
+                function showSkip(side) {
+                    centerControls.style.opacity = 1;
+
+                    if (side === 'left') {
+                        leftSkip.style.transform = "scale(1.2)";
+                        setTimeout(() => leftSkip.style.transform = "scale(1)", 200);
+                    } else {
+                        rightSkip.style.transform = "scale(1.2)";
+                        setTimeout(() => rightSkip.style.transform = "scale(1)", 200);
+                    }
+
+                    setTimeout(() => {
+                        centerControls.style.opacity = 0;
+                    }, 800);
+                }
             }
 
             function playEpisode(url) {
@@ -169,29 +291,192 @@
             padding: 0px !important;
         }
 
+        /* Prev / Next Episode Buttons — Base */
+        .plyr__prev-episode-btn,
         .plyr__next-episode-btn {
-            background-color: rgba(0, 0, 0, 0.9);
+            background-color: rgba(0, 0, 0, 0.85);
             color: #fff;
             border: none;
-            padding: 8px 16px;
-            font-size: 14px !important;
-            margin-left: 10px;
+            padding: 6px 12px;
+            font-size: 12px !important;
+            margin-left: 6px;
             border-radius: 4px;
             cursor: pointer;
-            z-index: 99999;
+            z-index: 9999;
             transition: background-color 0.3s;
+            white-space: nowrap;
         }
 
-        /* .nav-pills button{
-                                  color: #FFFFFF;
-                      border: 1px solid #FF3A1F !important;
-                      background-color:
-                            } */
+        .plyr__prev-episode-btn:hover,
+        .plyr__next-episode-btn:hover {
+            background-color: rgba(255, 58, 31, 0.9);
+        }
+
+        /* Countdown Overlay ON the Video */
+        .plyr__countdown-overlay {
+            display: none;
+            position: absolute;
+            bottom: 70px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.78);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.5;
+            z-index: 9999;
+            text-align: center;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            pointer-events: none;
+            min-width: 160px;
+        }
+
+        .plyr__countdown-overlay .up-next-label {
+            font-size: 10px;
+            opacity: 0.75;
+            display: block;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .plyr__countdown-overlay .countdown-timer {
+            font-size: 14px;
+            font-weight: 700;
+            display: block;
+        }
+
+        /* Tablet (max 940px) */
+        @media (max-width: 940px) {
+
+            .plyr__prev-episode-btn,
+            .plyr__next-episode-btn {
+                padding: 5px 9px;
+                font-size: 10px !important;
+                margin-left: 4px;
+                position: static !important;
+                top: unset !important;
+            }
+
+            .plyr__countdown-overlay {
+                bottom: 60px;
+                right: 10px;
+                padding: 8px 12px;
+                min-width: 130px;
+            }
+
+            .plyr__countdown-overlay .up-next-label {
+                font-size: 9px;
+            }
+
+            .plyr__countdown-overlay .countdown-timer {
+                font-size: 12px;
+            }
+        }
+
+        /* Mobile (max 540px) */
+        @media (max-width: 540px) {
+            #innerBanners {
+                margin-top: 45px !important;
+            }
+
+            .plyr__prev-episode-btn,
+            .plyr__next-episode-btn {
+                padding: 4px 7px;
+                font-size: 9px !important;
+                margin-left: 3px;
+                border-radius: 3px;
+            }
+
+            .plyr__countdown-overlay {
+                bottom: 52px;
+                right: 8px;
+                padding: 6px 10px;
+                min-width: 110px;
+                border-radius: 6px;
+            }
+
+            .plyr__countdown-overlay .up-next-label {
+                font-size: 8px;
+            }
+
+            .plyr__countdown-overlay .countdown-timer {
+                font-size: 11px;
+            }
+
+            .cast-name-container {
+                height: 50px;
+            }
+
+            .cast-name-container p {
+                font-size: 12px !important;
+            }
+
+            .nav-pills .nav-link {
+                font-size: 12px !important;
+            }
+
+            .ep-number {
+                font-size: 12px !important;
+            }
+        }
+
+        /* CENTER CONTROLS */
+        .plyr__center-controls {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 700px;
+            /* distance from play button */
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Show on hover */
+        .plyr:hover .plyr__center-controls {
+            opacity: 1;
+        }
+
+        /* Skip buttons */
+        .plyr__center-skip {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            /* icon top, text bottom */
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: #fff;
+            font-size: 10px;
+            backdrop-filter: blur(6px);
+            pointer-events: auto;
+        }
+
+        /* Icon */
+        .plyr__center-skip i {
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        /* Text */
+        .plyr__center-skip span {
+            font-size: 10px;
+            font-weight: 600;
+        }
+
         .nav-pills .nav-link {
             border-radius: 5px !important;
             border: 1px solid #FF3A1F !important;
             color: #ff3a1f;
-
         }
 
         .nav-pills .nav-link.active {
@@ -200,7 +485,7 @@
             border-radius: 5px !important;
         }
 
-        /* new Added */
+        /* Cast */
         .cast-name-container {
             overflow: hidden;
             display: flex;
@@ -227,40 +512,238 @@
             top: 30%;
         }
 
-        @media(max-width:540px) {
-            #innerBanners {
-                margin-top: 45px !important
+        /* Share Button */
+        .btn-share {
+            background-color: #FF4B2B;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Share Modal Background */
+        .share-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        /* Share Modal Content Box */
+        .share-modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease;
+            position: relative;
+        }
+
+        /* Share Modal Close Button */
+        .share-modal .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #333;
+        }
+
+        /* Social Icons Row */
+        .share-icons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .share-icons a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .share-icons i {
+            font-size: 24px;
+            background: #f1f1f1;
+            padding: 12px;
+            border-radius: 50%;
+            margin-bottom: 5px;
+            transition: background 0.2s ease;
+        }
+
+        .share-icons i:hover {
+            background: #ddd;
+        }
+
+        /* Copy Link Box */
+        .copy-link-box {
+            display: flex;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .copy-link-box input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .copy-link-box button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .copy-link-box button:hover {
+            background: #0056b3;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
             }
 
-            .cast-image {
-                /* height: 80px !important; width: 80px !important; */
-            }
-
-            .cast-name-container {
-                height: 50px;
-                /* Reduced height for smaller screens */
-            }
-
-            .cast-name-container p {
-                font-size: 12px !important;
-            }
-
-            .nav-pills .nav-link {
-                font-size: 12px !important;
-            }
-
-            .ep-number {
-                font-size: 12px !important;
+            to {
+                opacity: 1;
+                transform: scale(1);
             }
         }
+
+        /* Toast Notification */
+        .custom-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 99999;
+        }
+
+        .custom-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+
+        /*new added*/
+    .btn-details-watchlist {
+        background-color: #FF4B2B;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+    }
+
+    .btn-details-watchlist:hover {
+        background-color: #FF4B2B;
+    }
+
+    .btn-details-watchlist .details-watchlist-tooltip {
+        display: none;
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.75);
+        color: #fff;
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        white-space: nowrap;
+        z-index: 10;
+    }
+
+    .btn-details-watchlist:hover .details-watchlist-tooltip {
+        display: block;
+    }
+
+    .btn-details-watchlist-anchor {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #FF4B2B;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+        position: relative;
+    }
+
+    .btn-details-watchlist-anchor:hover {
+        background-color: #FF4B2B;
+        color: white;
+    }
+
+    .btn-details-watchlist-anchor .details-watchlist-tooltip {
+        display: none;
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.75);
+        color: #fff;
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        white-space: nowrap;
+        z-index: 10;
+    }
+
+    .btn-details-watchlist-anchor:hover .details-watchlist-tooltip {
+        display: block;
+    }
+
+    .details-watchlist-form {
+        margin-bottom: 0;
+        display: inline-flex;
+    }
     </style>
     <section id="innerBanners" class="inner-banner">
         <div class="inner-banner-section">
-            <div class="inner-banner-holder {{ $user_subscription == 'Yes' ? 'd-none' : 'd-block' }}">
-                <img src="https://alphastudioz.in/admin_panel/public/images/series/{{ $video->landscape }}"
-                    class="inner-landscape" width="100%" alt="">
-                <img src="https://alphastudioz.in/admin_panel/public/images/series/{{ $video->thumbnail }}"
-                    class="inner-thumbnail" width="100%" alt="">
+            <div class="inner-banner-holder {{ $user && $user->subscription == 'Yes' ? 'd-none' : 'd-block' }}">
+                <img src="{{ config('app.website_url') }}admin_panel/public/images/series/{{ $video->landscape }}"
+                    class="inner-landscape" width="100%" alt="{{ $video->landscape }}" loading="lazy">
+                <img src="{{ config('app.website_url') }}admin_panel/public/images/series/{{ $video->thumbnail }}"
+                    class="inner-thumbnail" width="100%" alt="{{ $video->landscape }}" loading="lazy">
                 <div class="overlay position-absolute">
                     <div class="movie-short-description ">
                         <div class="row">
@@ -282,22 +765,36 @@
                                     </ul>
                                     {{-- <p>Director : <span class="bold-600">Sohail Khan</span> </p> --}}
                                     <div class="d-flex position-relative">
-                                        @if (app('logged-in-user')->subscription == 'No')
-                                            <a href="{{ route('subscribe') }}">
-                                                <button type="button" class="btn-watchnow "><i
-                                                        class="icon-play"></i>Subscribe To Watch</button>
+                                        @if ($user && $user->subscription == 'No')
+                                            <a href="#">
+                                                <button type="button" class="btn-watchnow " onclick="openSubscriptionModal()"><i
+                                                        class="fa-solid fa-play"></i>&nbsp;&nbsp;Subscribe To Watch</button>
+                                            </a>
+                                        @elseif(!$user)
+                                            <a href="#" onclick="openSubscriptionModal()">
+                                                <button type="button" class="btn-watchnow"><i
+                                                        class="fa-solid fa-play"></i>&nbsp;&nbsp;Watch Now</button>
                                             </a>
                                         @else
                                             <a href="#">
-                                                <button type="button" class="btn-common watch-now"><i
+                                                <button type="button" class="btn-watchnow watch-now"><i
                                                         class="fa-solid fa-play"></i>&nbsp;&nbsp;Watch Now</button>
                                             </a>
                                         @endif
                                         @include('watchlist-button', [
                                             'id' => $video->id,
+                                            'type_id' => $video->type_id,
+                                            'category_id' => $video->category_id,
                                             'type' => 'series',
                                             'watchlist' => $watchlist,
                                         ])
+                                        <a href="#">
+                                            <button type="button" class="btn-watchlist ms-2 text-white"
+                                                onclick="openShareModal()">
+                                                <i class="fa fa-share"></i>
+                                                <div class="toast-message-box-rm">Share</div>
+                                            </button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -307,43 +804,44 @@
             </div>
             @if ($video->episode_upload_type == 'youtube')
                 <iframe
-                    src="{{ $video->episode_320 }}{{ app('logged-in-user')->subscription == 'Yes' ? '&autoplay=1' : '' }}&rel=0&showinfo=0&modestbranding=1"
+                    src="{{ $video->episode_320 }}{{ $user && $user->subscription == 'Yes' ? '&autoplay=1' : '' }}&rel=0&showinfo=0&modestbranding=1"
                     height="600px" width="100%" frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     referrerpolicy="strict-origin-when-cross-origin" allowfullscreen id="player"
-                    style="display: {{ app('logged-in-user')->subscription == 'Yes' ? 'block' : 'none' }};"></iframe>
+                    style="display: {{ $user && $user->subscription == 'Yes' ? 'block' : 'none' }};"></iframe>
             @elseif($video->episode_upload_type == 'bn_stream_url')
-                <div style="position:relative;padding-top:56.25%; display: {{ app('logged-in-user')->subscription == 'Yes' ? 'block' : 'none' }};"
-                    id="player" oncontextmenu="return false;"><iframe
-                        src="{{ $video->Episods_320 }}?autoplay=true&loop=false&muted=false&preload=true&responsive=true"
+                <div style="position:relative;padding-top:56.25%; display: {{ $user && $user->subscription == 'Yes' ? 'block' : 'none' }};"
+                    id="bunny-stream-container" oncontextmenu="return false;">
+                    <iframe id="bunnyPlayerIframe"
+                        src="{{ $video->episode_320 }}?autoplay=true&loop=false&muted=false&preload=true&responsive=true&playerjs=true"
                         loading="lazy" style="border:0;position:absolute;top:0;height:100%;width:100%;"
                         allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
-                        allowfullscreen="true"></iframe></div>
+                        allowfullscreen="true"></iframe>
+                </div>
             @elseif($video->episode_upload_type == 'server_episodes')
-                @if (app('logged-in-user')->subscription == 'Yes')
+                @if ($user && $user->subscription == 'Yes')
                     <video controls autoplay playsinline poster="{{ $video->landscape_url }}" preload="auto"
                         id="webseriesplayer"
-                        style="display: {{ app('logged-in-user')->subscription == 'Yes' ? 'block' : 'none' }};"
-                        class="w-100">
+                        style="display: {{ $user && $user->subscription == 'Yes' ? 'block' : 'none' }};" class="w-100">
                         <source
-                            src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->episode_320) }}"
+                            src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->episode_320) }}"
                             type="video/mp4" size="360">
                         <source
-                            src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->episode_480) }}"
+                            src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->episode_480) }}"
                             type="video/mp4" size="480">
                         <source
-                            src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->episode_720) }}"
+                            src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->episode_720) }}"
                             type="video/mp4" size="720">
                         <source
-                            src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->episode_1080) }}"
+                            src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->episode_1080) }}"
                             type="video/mp4" size="1080">
                         Your browser does not support the video tag.
                     </video>
                 @endif
             @else
-                @if (app('logged-in-user')->subscription == 'Yes')
+                @if ($user && $user->subscription == 'Yes')
                     <video id="transcodedplayer" controls playsinline class="w-100" poster="{{ $video->landscape_url }}"
-                        style="display: {{ app('logged-in-user')->subscription == 'Yes' ? 'block' : 'none' }};">
+                        style="display: {{ $user && $user->subscription == 'Yes' ? 'block' : 'none' }};">
                         <source src="" type="video/m3u8">
                         <source src="" type="video/m3u8">
                         <source src="" type="video/m3u8">
@@ -370,11 +868,11 @@
                 @endif
             @endif
     </section>
-    <section id="webseries-details" style="display: {{ $user_subscription == 'Yes' ? 'block' : 'none' }};">
+    <section id="webseries-details" style="display: {{ $user && $user->subscription == 'Yes' ? 'block' : 'none' }};">
         <div class="webseries-details-container">
             <div class="webseries-data">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-7">
                         <h2>{{ $video->name }}</h2>
                         <ul class="animate__animated animate__fadeInUp mt-3 ">
                             <li class="d-inline">{{ \Carbon\Carbon::parse($video->release_date)->format('Y') }}</li>
@@ -400,28 +898,91 @@
                         </div>
                         <span class="show-more-btn" id="toggleDescription">Show More</span>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section id="section-home-newdes" class="podcast">
-        <div class="home-newdes-section">
-            <div class="home-newdes-section-container">
-                <div class="container-fluid">
-                    <span class="l-head">Star Cast</span>
-                    {{-- Owl Carousel Container --}}
-                    <div id="starCastCarousel" class="owl-carousel owl-theme mt-3" data-skip-carousel="true">
-                        @foreach ($casts as $c)
-                            <div class="item text-center">
-                                <img src="{{ $c->image_url }}"
-                                    style="height: 100px; width: 100px; border-radius: 50%; object-fit: cover;"
-                                    class="img-fluid d-block mx-auto cast-image" alt="cast_image">
-                                {{-- Container for text to ensure fixed height --}}
-                                <div class="cast-name-container mt-2">
-                                    <p class="mt-1 mb-0 text-white">{{ $c->name }}</p>
-                                </div>
-                            </div>
-                        @endforeach
+                    <div class="col-md-5 float-right text-end">
+                        <div class="d-flex align-items-center justify-content-end gap-2">
+
+                            <!-- Share Button -->
+                            <button class="btn-share" onclick="openShareModal()">
+                                <i class="fa fa-share"></i>&nbsp; Share
+                            </button>
+
+                            <!-- Watchlist Button (inlined, unique classes) -->
+                           @php
+                            $type = 'episode';
+                            @endphp
+                            <!-- Watchlist Button (inlined, unique classes) -->
+                            @if ($watchlist->contains('episode_id', $video->id))
+                                <form action="{{ route('watchlist.toggle') }}" class="details-watchlist-form"
+                                    method="POST">
+                                    @csrf
+                                @if ($type == 'series')
+                                    <input type="hidden" name="series_id" value="{{ $video->id }}">
+                                @elseif($type == 'episode')
+                                    <input type="hidden" name="series_id" value="{{ $video->series_id }}">
+                                    <input type="hidden" name="episode_id" value="{{ $video->id }}">
+                                    <input type="hidden" name="video_id" value="{{ $video->id }}">
+                                @else
+                                    <input type="hidden" name="video_id" value="{{ $video->id }}">
+                                @endif
+                                <input type="hidden" name="type_id" value="{{ $video->type_id }}">
+                                <input type="hidden" name="category_id" value="{{ $video->category_id }}">
+                                <input type="hidden" name="type" value="{{ $type }}">
+                                    <button type="submit" class="btn-details-watchlist">
+                                        <svg width="24" height="13" viewBox="0 0 24 13" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="2.00845" height="9.87727" rx="1.00423"
+                                                transform="matrix(0.851668 -0.524082 0.556629 0.830761 0 4.08691)"
+                                                fill="white" />
+                                            <rect width="2.19463" height="21.0917" rx="1.09731"
+                                                transform="matrix(0.553502 0.832848 -0.853569 0.52098 22.7852 0)"
+                                                fill="white" />
+                                        </svg>
+                                        Watchlist
+                                        <div class="details-watchlist-tooltip">Remove from Watch List</div>
+                                    </button>
+                                </form>
+                            @elseif (!$user || $user->subscription !== 'Yes')
+                                <a href="#" class="btn-details-watchlist-anchor" onclick="openSubscriptionModal()">
+                                    <svg width="18" height="20" viewBox="0 0 18 20" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="8.45654" y="0.34668" width="1.61563" height="18.8704" rx="0.807817"
+                                            fill="white" />
+                                        <rect x="17.7461" y="8.88379" width="1.79718" height="16.9642" rx="0.89859"
+                                            transform="rotate(90 17.7461 8.88379)" fill="white" />
+                                    </svg>
+                                    Watchlist
+                                    <div class="details-watchlist-tooltip">Add to Watch List</div>
+                                </a>
+                            @else
+                                <form action="{{ route('watchlist.toggle') }}" method="POST" class="details-watchlist-form">
+                                    @csrf
+                                @if ($type == 'series')
+                                    <input type="hidden" name="series_id" value="{{ $video->series_id }}">
+                                @elseif($type == 'episode')
+                                    <input type="hidden" name="series_id" value="{{ $video->series_id }}">
+                                    <input type="hidden" name="episode_id" value="{{ $video->id }}">
+                                    <input type="hidden" name="video_id" value="{{ $video->id }}">
+                                @else
+                                    <input type="hidden" name="video_id" value="{{ $video->id }}">
+                                @endif
+                                <input type="hidden" name="type_id" value="{{ $video->type_id }}">
+                                <input type="hidden" name="category_id" value="{{ $video->category_id }}">
+                                <input type="hidden" name="type" value="{{ $type }}">
+                                    <button type="submit" class="btn-details-watchlist">
+                                        <svg width="18" height="20" viewBox="0 0 18 20" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="8.45654" y="0.34668" width="1.61563" height="18.8704" rx="0.807817"
+                                                fill="white" />
+                                            <rect x="17.7461" y="8.88379" width="1.79718" height="16.9642" rx="0.89859"
+                                                transform="rotate(90 17.7461 8.88379)" fill="white" />
+                                        </svg>
+                                        Watchlist
+                                        <div class="details-watchlist-tooltip">Add to Watch List</div>
+                                    </button>
+                                </form>
+                            @endif
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -450,6 +1011,7 @@
                                 $episodesdata = DB::table('episodes')
                                     ->where('season_id', $data->id)
                                     ->where('status', 1)
+                                    ->orderBy('episode_no', 'DESC')
                                     ->get();
                             @endphp
                             <div class="tab-pane fade @if ($index == 0) show active @endif"
@@ -466,21 +1028,23 @@
                                                                 href="{{ route('webseries.episodes.view', [
                                                                     'id' => App\Helpers\VideoHelper::encryptID($e->id),
                                                                 ]) }}">
-                                                                <img src="https://alphastudioz.in/admin_panel/public/images/series/{{ $e->landscape }}"
-                                                                    alt="">
+                                                                <img src="{{ config('app.website_url') }}admin_panel/public/images/series/{{ $e->landscape }}"
+                                                                    alt="{{ $e->landscape }}" loading="lazy">
                                                             </a>
                                                             <p class="ep-number text-white">{{ $data->season }}
                                                                 | Episode {{ $e->episode_no }} </p>
                                                         </div>
                                                         <div class="alpha-card-large {{ $e->trailer_url ? 'movie-card' : '' }}"
                                                             id="movie-card">
-                                                            <img src="https://alphastudioz.in/admin_panel/public/images/series/{{ $e->landscape }}"
-                                                                class="thumbnail" id="thumbnail" alt="">
+                                                            <img src="{{ config('app.website_url') }}admin_panel/public/images/series/{{ $e->landscape }}"
+                                                                class="thumbnail" id="thumbnail"
+                                                                alt="{{ $e->landscape }}" loading="lazy">
                                                             <video class="video-holder" loop muted id="video-holder">
-                                                                <source src="{{ $e->trailer_url }}" type="video/mp4">
+                                                                <source
+                                                                    src="{{ config('app.website_url') }}admin_panel/public/images/video/{{ $e->trailer_url }}"
+                                                                    type="video/mp4">
                                                             </video>
                                                             <div class="content-holder pt-5">
-                                                                {{-- <img src="{{url('/')}}/asset/images/tere-sang.png" class="title mt-5" alt=""> --}}
                                                                 <div class="content">
                                                                     <div class="button-holder row">
                                                                         <div class="col-9">
@@ -497,6 +1061,8 @@
                                                                         <div class="col-3">
                                                                             @include('watchlist-button', [
                                                                                 'id' => $e->id,
+                                                                                'type_id' => $e->type_id,
+                                                                                'category_id' => $e->category_id,
                                                                                 'type' => 'episode',
                                                                                 'watchlist' => $watchlist,
                                                                             ])
@@ -552,18 +1118,18 @@
                                             <div class="image-wrapper">
                                                 <a
                                                     href="{{ route('webseries.view', ['id' => App\Helpers\VideoHelper::encryptID($item->id)]) }}"><img
-                                                        src="https://alphastudioz.in/admin_panel/public/images/series/{{ $item->landscape_image }}"
-                                                        alt=""></a>
+                                                        src="{{ config('app.website_url') }}admin_panel/public/images/series/{{ $item->landscape_image }}"
+                                                        alt="{{ $item->landscape_image }}" loading="lazy"></a>
                                             </div>
                                             <div class="alpha-card-large {{ $item->trailer_url ? 'movie-card' : '' }}"
                                                 id="movie-card">
-                                                <img src="https://alphastudioz.in/admin_panel/public/images/series/{{ $item->landscape_image }}"
-                                                    class="thumbnail" id="thumbnail" alt="">
+                                                <img src="{{ config('app.website_url') }}admin_panel/public/images/series/{{ $item->landscape_image }}"
+                                                    class="thumbnail" id="thumbnail" alt="{{ $item->landscape_image }}"
+                                                    loading="lazy">
                                                 <video class="video-holder" loop muted id="video-holder">
                                                     <source src="{{ $item->trailer_url }}" type="video/mp4">
                                                 </video>
                                                 <div class="content-holder">
-                                                    {{-- <img src="{{url('/')}}/asset/images/tere-sang.png" class="title mt-5" alt=""> --}}
                                                     <div class="content">
                                                         <div class="button-holder row">
                                                             <div class="col-9">
@@ -576,7 +1142,9 @@
                                                             <div class="col-3">
                                                                 @include('watchlist-button', [
                                                                     'id' => $item->id,
-                                                                    'type' => 'series',
+                                                                    'type_id' => $item->type_id,
+                                                                    'category_id' => $item->category_id,
+                                                                    'type' => 'episode',
                                                                     'watchlist' => $watchlist,
                                                                 ])
                                                             </div>
@@ -605,5 +1173,113 @@
             </div>
         </div>
     </section>
-    @endsection
-   
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="share-modal">
+        <div class="share-modal-content">
+            <span class="close" onclick="closeShareModal()">&times;</span>
+            <h3 class="text-lg font-semibold mb-4">Share</h3>
+
+            <!-- Social Icons -->
+            <div class="share-icons">
+                <!-- WhatsApp -->
+                <a href="https://wa.me/?text={{ urlencode(route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($video->id)])) }}"
+                    target="_blank">
+                    <i class="fa-brands fa-whatsapp" style="color:#25D366;"></i>
+                    <span>WhatsApp</span>
+                </a>
+
+                <!-- Facebook -->
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($video->id)])) }}"
+                    target="_blank">
+                    <i class="fa-brands fa-facebook" style="color:#1877F2;"></i>
+                    <span>Facebook</span>
+                </a>
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/?url={{ urlencode(route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($video->id)])) }}"
+                    target="_blank">
+                    <i class="fa-brands fa-instagram"
+                        style="background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+                           -webkit-background-clip: text;
+                           -webkit-text-fill-color: transparent;"></i>
+                    <span>Instagram</span>
+                </a>
+                <!-- X (Twitter) -->
+                <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($video->id)])) }}"
+                    target="_blank">
+                    <i class="fa-brands fa-x-twitter" style="color:#000;"></i>
+                    <span>X</span>
+                </a>
+
+
+            </div>
+
+            <!-- Copy Link Section -->
+            <div class="copy-link-box">
+                <input type="text" id="shareLink"
+                    value="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($video->id)]) }}"
+                    readonly>
+                <button onclick="copyShareLink()">Copy</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openShareModal() {
+            document.getElementById("shareModal").style.display = "block";
+        }
+
+        function closeShareModal() {
+            document.getElementById("shareModal").style.display = "none";
+        }
+
+        function copyShareLink() {
+            let input = document.getElementById("shareLink");
+
+            // Select the text
+            input.select();
+            input.setSelectionRange(0, 99999); // for mobile devices
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(input.value)
+                    .then(() => showToast("Link copied!"))
+                    .catch(() => fallbackCopy(input));
+            } else {
+                fallbackCopy(input);
+            }
+        }
+
+        function fallbackCopy(input) {
+            try {
+                document.execCommand('copy');
+                showToast("Link copied!");
+            } catch (err) {
+                showToast("Could not copy link. Please copy manually.");
+            }
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            let toast = document.createElement("div");
+            toast.className = "custom-toast";
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add("show");
+            }, 100);
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            let modal = document.getElementById("shareModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+@endsection

@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Subscription
+    {{ config('app.project_name') }} | Subscription
 @endsection
 @section('main-section')
 <div class="row ms-0 me-0">

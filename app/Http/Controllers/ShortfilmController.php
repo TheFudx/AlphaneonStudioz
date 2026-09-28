@@ -13,9 +13,12 @@ class ShortfilmController extends Controller
         ->select('category.name as category_name','category.id as cat_id')
         ->distinct()
         ->where('video.type_id','=',config('constant.TYPES.SHORTFILMS'))->get();
-        $video = Video::active()->where('type_id',config('constant.TYPES.SHORTFILMS'))->select('video.*', 'language.name as language_name')
-        ->join('language', 'language.id', '=', 'video.language_id')
-        ->paginate(config('constant.PER_PAGE'));
+        $video = Video::active()->where('type_id',config('constant.TYPES.SHORTFILMS'))
+        ->whereNotNull('video.landscape')
+        ->where('video.landscape', '!=', '')
+        ->select('video.*', 'language.name as language_name')
+        ->join('language', 'language.id', '=', 'video.language_id')->orderBy('video.order_by', 'desc')
+        ->paginate(24);
         
         $watchlist = app('wishlist');
         session(['watchlist' => $watchlist]);

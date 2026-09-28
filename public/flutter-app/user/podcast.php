@@ -1,4 +1,6 @@
 <?php
+
+use Razorpay\Api\Order;
 // Database connection details
 include 'database.php';
 
@@ -29,7 +31,8 @@ language l ON v.language_id = l.id
 LEFT JOIN 
 category cat ON v.category_id = cat.id
 WHERE 
-v.type_id = 11
+v.type_id = 11  AND v.status = 1
+Order BY v.created_at DESC
 GROUP BY 
 v.name, 
 v.thumbnail_url, 

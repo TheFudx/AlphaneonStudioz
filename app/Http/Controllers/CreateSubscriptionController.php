@@ -8,8 +8,8 @@ class CreateSubscriptionController extends Controller
     private $razorpaySecret;
     public function __construct()
     {
-        $this->razorpayKey = env('RAZORPAY_KEY'); // Set this in your .env file
-        $this->razorpaySecret = env('RAZORPAY_SECRET'); // Set this in your .env file
+        $this->razorpayKey = config('app.razorpay_key') ?: env('RAZORPAY_KEY');
+        $this->razorpaySecret = config('app.razorpay_secret') ?: env('RAZORPAY_SECRET');
     }
     public function createSubscription(Request $request)
     {

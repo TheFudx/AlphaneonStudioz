@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Terms & Conditions
+    {{ config('app.project_name') }} | Terms & Conditions
 @endsection
 @section('main-section')
     <style>
@@ -40,14 +40,14 @@
                 <div class="container">
                     <span class="heading-text d-block mb-3">Terms & Conditions</span>
                     <p>
-                        Welcome to Alphaneon Studioz! These Terms & Conditions govern your use of our over-the-top content
+                        Welcome to {{ config('app.project_full_name') }}! These Terms & Conditions govern your use of our over-the-top content
                         streaming services. By accessing or using our platform, you agree to comply with these Terms &
                         Conditions. If you do not agree with any part of these terms, please do not access the platform or
                         use our services.
                     </p>
                     <hr class="mb-4">
                     <span class="heading-text d-block mb-3">1. Introduction</span>
-                    <p>1.1. Alphaneon Studioz provides a platform for streaming digital content over the internet.</p>
+                    <p>1.1. {{ config('app.project_full_name') }} provides a platform for streaming digital content over the internet.</p>
                     <p>1.2. Our services include but are not limited to streaming movies, TV shows, documentaries, and other
                         entertainment content.</p>
                     <span class="heading-text d-block mb-3">2. User Eligibility</span>
@@ -66,7 +66,7 @@
                     <span class="heading-text d-block mb-3">5. Contact Us</span>
                     <p>
                         5.1. If you have any questions or concerns about these Terms & Conditions, please contact us at
-                        <a href="mailto:info@alphastudioz.in" style="color: #FF3A1F;">info@alphastudioz.in</a>.
+                        <a href="mailto:{{ 'info@' . strtolower(config('app.project_name')) . '.in' }}" style="color: #FF3A1F;">{{ 'info@' . strtolower(config('app.project_name')) . '.in' }}</a>.
                     </p>
                 </div>
             </div>

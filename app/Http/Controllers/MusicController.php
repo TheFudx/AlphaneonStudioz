@@ -22,7 +22,9 @@ class MusicController extends Controller
         $video = Video::active()->select('video.*', 'language.name as language_name')
         ->join('language', 'language.id', '=', 'video.language_id')
         ->where('type_id',config('constant.TYPES.MUSIC'))
-        ->orderBy('created_at', 'desc')->paginate(config('constant.PER_PAGE')); 
+        ->whereNotNull('video.landscape')
+        ->where('video.landscape', '!=', '')
+        ->orderBy('created_at', 'desc')->paginate(24); 
         
         $watchlist = app('wishlist');
         session(['watchlist' => $watchlist]);

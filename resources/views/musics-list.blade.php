@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Musics
+    {{ config('app.project_name') }} | Musics
 @endsection
 <style>
     .owl-carousel .owl-nav.disabled {
@@ -18,7 +18,7 @@
         <div class="home-newdes-section">
             <div class="home-newdes-section-container">
                 <div class="container-fluid">
-                    <span class="l-head">Podcasts </span>
+                    <span class="l-head">Musics </span>
                     <div class="category mt-md-3 mt-3">
                         <div class="category-carousel">
                             <div id="categories" class="owl-carousel owl-theme" data-skip-carousel="true">
@@ -48,13 +48,16 @@
                                         <div class="cards-container">
                                             <div class="alpha-card skeleton card-for-podcast">
                                                 <div class="image-wrapper">
-                                                    <a href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($videoItem->id)]) }}"><img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $videoItem->landscape }}"
-                                                        alt=""></a>
+                                                    <a href="{{ route('view.details.slug', ['content' => 'musics', 'slug' => $videoItem->slug]) }}">
+                                                        <img src="{{ !empty($videoItem->landscape) ? config('app.website_url') . 'admin_panel/public/images/video/' . $videoItem->landscape : asset('asset/images/thumbnail-1.png') }}"
+                                                        onerror="this.onerror=null;this.src='{{ asset('asset/images/thumbnail-1.png') }}';"
+                                                        alt="{{ $videoItem->landscape ?? 'Music' }}" loading="lazy"></a>
                                                 </div>
                                                 <div class="alpha-card-large {{ $videoItem->trailer_url ? 'movie-card' : '' }}"
                                                     id="movie-card">
-                                                    <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $videoItem->landscape }}"
-                                                        class="thumbnail" id="thumbnail" alt="">
+                                                    <img src="{{ !empty($videoItem->landscape) ? config('app.website_url') . 'admin_panel/public/images/video/' . $videoItem->landscape : asset('asset/images/thumbnail-1.png') }}"
+                                                        onerror="this.onerror=null;this.src='{{ asset('asset/images/thumbnail-1.png') }}';"
+                                                        class="thumbnail" id="thumbnail" alt="{{ $videoItem->landscape ?? 'Music' }}" loading="lazy">
                                                     <video class="video-holder" loop muted id="video-holder">
                                                         <source src="{{ $videoItem->trailer_url }}" type="video/mp4">
                                                     </video>
@@ -64,13 +67,14 @@
                                                             <div class="button-holder row">
                                                                 <div class="col-9">
                                                                     <a
-                                                                        href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($videoItem->id)]) }}">
+                                                                        href="{{ route('view.details.slug', ['content' => 'musics', 'slug' => $videoItem->slug]) }}">
                                                                         <button class="btn-watchnow" type="button">
                                                                            <i class="fa-solid fa-play"></i>&nbsp;&nbsp;
                                                                             Watch Now</button></a>
                                                                 </div>
                                                                 <div class="col-3">
-                                                                    @include('watchlist-button', ['id' => $videoItem->id, 'type' => 'video', 'watchlist' => $watchlist])
+                                                                    @include('watchlist-button', ['id' => $videoItem->id,
+                                                                     'type_id' => $videoItem->type_id, 'category_id' => $videoItem->category_id, 'type' => 'video', 'watchlist' => $watchlist])
                                                                     
                                                                 </div>
                                                             </div>

@@ -28,23 +28,33 @@ class DeviseSessionDataStore extends Command
      */
     public function handle()
     {
-        Log::info("--------------------------------------Cron start:  devise-session-data-store ----------------------------------------");
+        // Log::info("--------------------------------------Cron start:  devise-session-data-store ----------------------------------------");
         $device_session = DeviceSession::where('browser',null)->get();
         // $device_session = DeviceSession::get();
         $count = 0;
-        foreach($device_session as $d){
-            $browser = Browser::parse($d->device_name);
+        foreach ($device_session as $d) {
 
-            $d->browser =  $browser->browserFamily();      // e.g. "Edge"
-            $d->browser_version =  $browser->browserVersion();// e.g. "138.0.0.0"
-            $d->platform =  $browser->platformFamily();    // e.g. "Windows"
-            $d->platform_version =  $browser->platformVersion();// e.g. "10.0"
-            $d->device_type =  $browser->deviceType();     // e.g. "desktop", "mobile", "tablet"
-            $d->update();
+            $agent = $d->device_name;
+
+            if (!is_string($agent) || trim($agent) === '') {
+                $agent = 'Mozilla/5.0 (Compatible; Unknown Device)';
+            }
+
+            $browser = Browser::parse($agent);
+
+            $d->browser          = $browser->browserFamily();
+            $d->browser_version  = $browser->browserVersion();
+            $d->platform         = $browser->platformFamily();
+            $d->platform_version = $browser->platformVersion();
+            $d->device_type      = $browser->deviceType();
+
+            $d->save();
             $count++;
         }
-        Log::info("Recored Updated {$count}");
-        $this->info("Recored Updated {$count}");
-        Log::info("--------------------------------------Cron end:  devise-session-data-store ----------------------------------------");
+        if($count != 0){
+            Log::info("Record Updated {$count}");
+        }
+        $this->info("Record Updated {$count}");
+        // Log::info("--------------------------------------Cron end:  devise-session-data-store ----------------------------------------");
     }
 }

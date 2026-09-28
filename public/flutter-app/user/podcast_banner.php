@@ -8,22 +8,22 @@ $typeId = 11;
 
 // Fetch videos from the database for the specified category ID
 $sql = "SELECT v.name as video_name, v.thumbnail_url, v.release_date, v.description, v.video_duration, v.video_480_url, v.video_720_url, v.video_1080_url, v.landscape_url, v.category_id, l.name as language_name, v.cast_id,
-(SELECT GROUP_CONCAT(c.name SEPARATOR ', ') 
- FROM cast c 
- WHERE FIND_IN_SET(c.id, v.cast_id)) as cast_names,
-(SELECT GROUP_CONCAT(c.image_url SEPARATOR ', ') 
- FROM cast c 
- WHERE FIND_IN_SET(c.id, v.cast_id)) as cast_image_urls,
-(SELECT GROUP_CONCAT(cat.name SEPARATOR ', ')
-FROM category cat
-WHERE FIND_IN_SET(cat.id, v.category_id)) as category_names,
-(SELECT GROUP_CONCAT(v.thumbnail_url SEPARATOR ', ')
-FROM video v
-WHERE FIND_IN_SET(v.id, v.category_id)) as category_urls
-FROM video v
-INNER JOIN language l ON v.language_id = l.id
-WHERE FIND_IN_SET('$categoryId', v.category_id)
-        AND v.type_id = '$typeId'"; // Added table prefix for type_id
+            (SELECT GROUP_CONCAT(c.name SEPARATOR ', ') 
+            FROM cast c 
+            WHERE FIND_IN_SET(c.id, v.cast_id)) as cast_names,
+            (SELECT GROUP_CONCAT(c.image_url SEPARATOR ', ') 
+            FROM cast c 
+            WHERE FIND_IN_SET(c.id, v.cast_id)) as cast_image_urls,
+            (SELECT GROUP_CONCAT(cat.name SEPARATOR ', ')
+            FROM category cat
+            WHERE FIND_IN_SET(cat.id, v.category_id)) as category_names,
+            (SELECT GROUP_CONCAT(v.thumbnail_url SEPARATOR ', ')
+            FROM video v
+            WHERE FIND_IN_SET(v.id, v.category_id)) as category_urls
+            FROM video v
+            INNER JOIN language l ON v.language_id = l.id
+            WHERE FIND_IN_SET('$categoryId', v.category_id)
+                    AND v.type_id = '$typeId' AND v.language_id = 1 AND v.status = 1 Order BY v.order_by DESC" ; // Added table prefix for type_id
 
 $result = mysqli_query($connectNow, $sql);
 

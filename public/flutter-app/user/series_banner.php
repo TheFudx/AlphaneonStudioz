@@ -44,6 +44,8 @@ LEFT JOIN
     season se ON s.id = se.series_id
 LEFT JOIN 
     episodes e ON se.id = e.season_id
+WHERE 
+    s.status = 1
 ORDER BY 
     s.name, se.season, e.episode_no
 

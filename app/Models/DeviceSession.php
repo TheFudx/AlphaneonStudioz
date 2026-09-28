@@ -29,22 +29,22 @@ class DeviceSession extends Model
         return $this->belongsTo(User::class);
     }
     protected static function booted()
-    {
-        static::creating(function ($deviceSession) {
-            if ($deviceSession->device_name) {
-                $request = request(); // ✅ grab current request instance
+{
+    static::creating(function ($deviceSession) {
+        if ($deviceSession->device_name) {
+            $request = request(); // ✅ grab current request instance
 
-                $parsed = Browser::parse($deviceSession->device_name);
+            $parsed = Browser::parse($deviceSession->device_name);
 
-                // ✅ check request input for is_brave (from JS)
-                $browser = $request->input('is_brave') == 1 ? 'Brave' : $parsed->browserFamily();
+            // ✅ check request input for is_brave (from JS)
+            $browser = $request->input('is_brave') == 1 ? 'Brave' : $parsed->browserFamily();
 
-                $deviceSession->browser = $browser;
-                $deviceSession->browser_version = $parsed->browserVersion();
-                $deviceSession->platform = $parsed->platformFamily();
-                $deviceSession->platform_version = $parsed->platformVersion();
-                $deviceSession->device_type = $parsed->deviceType();
-            }
-        });
-    }
+            $deviceSession->browser = $browser;
+            $deviceSession->browser_version = $parsed->browserVersion();
+            $deviceSession->platform = $parsed->platformFamily();
+            $deviceSession->platform_version = $parsed->platformVersion();
+            $deviceSession->device_type = $parsed->deviceType();
+        }
+    });
+}
 }

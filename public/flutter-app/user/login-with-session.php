@@ -66,7 +66,7 @@ if (mysqli_num_rows($userData) > 0) {
             $deviceCount = mysqli_fetch_assoc($resultDeviceCount)['total'];
 
             // Step 2: Get package_id from user_subscriptions table
-            $subscriptionQuery = mysqli_prepare($connectNow, "SELECT package_id FROM user_subscriptions WHERE user_id = ? AND razorpay_subscription_id = ? AND status = 1");
+            $subscriptionQuery = mysqli_prepare($connectNow, "SELECT package_id FROM user_subscriptions WHERE user_id = ? AND razorpay_subscription_id = ?");
             mysqli_stmt_bind_param($subscriptionQuery, "is", $user['id'], $user['razorpay_subscription_id']);
             mysqli_stmt_execute($subscriptionQuery);
             $subscriptionResult = mysqli_stmt_get_result($subscriptionQuery);

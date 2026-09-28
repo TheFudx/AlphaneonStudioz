@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Refund Policy
+    {{ config('app.project_name') }} | Refund Policy
 @endsection
 @section('main-section')
     <style>
@@ -40,7 +40,7 @@
                 <div class="container">
                     <span class="heading-text d-block mb-3">Refund Policy</span>
                     <p>
-                        Thank you for choosing Alphaneon Studioz for your entertainment needs. We strive to provide you with
+                        Thank you for choosing {{ config('app.project_full_name') }} for your entertainment needs. We strive to provide you with
                         a seamless and enjoyable streaming experience. Please read the following policy regarding refunds
                         carefully.
                     </p>
@@ -69,14 +69,14 @@
                     <span class="heading-text d-block mb-3">4. Contact Us</span>
                     <p>
                         If you encounter any issues or have questions regarding our refund policy, please don't hesitate to
-                        contact our customer support team at <a href="mailto:info@alphastudioz.in" style="color:#FF3A1F;">info@alphastudioz.in</a>.
+                        contact our customer support team at <a href="mailto:{{ 'info@' . strtolower(config('app.project_name')) . '.in' }}" style="color:#FF3A1F;">{{ 'info@' . strtolower(config('app.project_name')) . '.in' }}</a>.
                         We're here to assist you and address any concerns you may have.
                     </p>
                     <p>
-                        By using Alphaneon Studioz, you agree to abide by the terms of this refund policy. We appreciate your
+                        By using {{ config('app.project_full_name') }}, you agree to abide by the terms of this refund policy. We appreciate your
                         understanding and support as we continue to improve and enhance our services for our valued users.
                     </p>
-                    <p><strong>Sincerely,<br>Alphaneon Studioz Team</strong></p>
+                    <p><strong>Sincerely,<br>{{ config('app.project_full_name') }} Team</strong></p>
                 </div>
             </div>
         </div>

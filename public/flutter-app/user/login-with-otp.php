@@ -1,4 +1,13 @@
 <?php 
+    //Logs
+    require __DIR__ . '/../../../vendor/autoload.php';
+    $app = require_once __DIR__ . '/../../../bootstrap/app.php';
+
+    use Illuminate\Support\Facades\Log;
+    $app->make('Illuminate\Contracts\Http\Kernel')->handle(
+        Illuminate\Http\Request::capture()
+    );
+
     include 'database.php';
     
     // Get data from POST request
@@ -141,7 +150,7 @@
         $sqlQuerySession = mysqli_prepare($connectNow, "INSERT INTO sessions (id, user_id, ip_address, user_agent, payload, last_activity) VALUES (?, ?, ?, ?, ?, ?)");
             mysqli_stmt_bind_param($sqlQuerySession, "sssssi", $session_id, $user['id'], $deviceIp, $user_agent, $payload, $last_activity);
             $resultSession = mysqli_stmt_execute($sqlQuerySession);
-            
+            Log::info('User login with mobile number: ' . $user['mobile_no']);
             
             // if($resultSession){
             //     echo json_encode([
@@ -181,9 +190,8 @@
         $stmtInsert = $connectNow->prepare("INSERT INTO users (`name`,`mobile_no`,`type`) VALUES (?,?,?)");
          
         $stmtInsert->bind_param("ssi", $name , $mobile_no, $mobileTYpe );
-     
         $stmtInsert->execute();
-       
+        Log::info('New user registered with mobile number: ' . $mobile_no);
         $newUserId = $stmtInsert->insert_id;
         $newUserSession =  $connectNow->prepare("INSERT INTO sessions (id,user_id,ip_address,user_agent, payload, last_activity) VALUES (?, ?, ?, ?, ?, ?)");
         $newUserSession->bind_param(
@@ -200,7 +208,7 @@
             "status" => "success",
             "message" => "Registration successful",
             "userId" => $newUserId,
-            "subscription" => $subscription,
+            "subscription" => 'No',
             "session_id" => $session_id,
             "device_id" => $device_id,
         ]);

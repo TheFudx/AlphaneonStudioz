@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Your Mood
+    {{ config('app.project_name') }} | Your Mood
 @endsection
 @section('main-section')
     <section id="section-home-newdes" class="podcast mt-5 pt-5">
@@ -23,7 +23,7 @@
                                 @if($video->isEmpty())
                                     <div class="col-12 text-center">
                                         {{-- Add your vector image here --}}
-                                        <img src="{{ URL::to('asset/images/no-data-found.png') }}" alt="No Videos Found" class="img-fluid" style="max-width: 300px; margin-top: 10px;">
+                                        <img src="{{ URL::to('asset/images/no-data-found.png') }}" alt="no-data-found.png" class="img-fluid" style="max-width: 300px; margin-top: 10px;">
                                         <h3 class="text-white mt-3">No Videos Found</h3>
                                         <p class="text-white">It seems there are no videos for this mood yet. Please check back later!</p>
                                     </div>
@@ -38,13 +38,13 @@
                                                     <div class="image-wrapper">
                                                         <a
                                                             href="{{ route('webseries.view', ['id' => App\Helpers\VideoHelper::encryptID($v->id)]) }}"><img
-                                                                src="https://alphastudioz.in/admin_panel/public/images/series/{{ $v->landscape_image }}"
-                                                                alt=""></a>
+                                                                src="{{ config('app.website_url') }}admin_panel/public/images/series/{{ $v->landscape_image }}"
+                                                                alt="{{ $v->landscape_image }}"></a>
                                                     </div>
                                                     <div class="alpha-card-large {{ $v->trailer_url ? 'movie-card' : '' }}"
                                                         id="movie-card">
-                                                        <img src="https://alphastudioz.in/admin_panel/public/images/series/{{ $v->landscape_image }}"
-                                                            class="thumbnail" id="thumbnail" alt="">
+                                                        <img src="{{ config('app.website_url') }}admin_panel/public/images/series/{{ $v->landscape_image }}"
+                                                            class="thumbnail" id="thumbnail" alt="{{ $v->landscape_image }}">
                                                         <video class="video-holder" loop muted id="video-holder">
                                                             <source src="{{ $v->trailer_url }}" type="video/mp4">
                                                         </video>
@@ -60,7 +60,8 @@
                                                                                 Watch Now</button></a>
                                                                     </div>
                                                                     <div class="col-3">
-                                                                        @include('watchlist-button', ['id' => $v->id, 'type' => 'series', 'watchlist' => $watchlist])
+                                                                        @include('watchlist-button', 
+                                                                        ['id' => $v->id, 'type_id' => $v->type_id, 'category_id' => $v->category_id, 'type' => 'series', 'watchlist' => $watchlist])
                                                                     </div>
                                                                 </div>
                                                                 <ul class="animate__animated animate__fadeInUp mt-3">
@@ -85,14 +86,14 @@
                                                     <div class="alpha-card skeleton">
                                                         <div class="image-wrapper">
                                                             <a
-                                                                href="{{ route('view.details', ['name' => $v->name, 'id' => App\Helpers\VideoHelper::encryptID($v->id)]) }}">
-                                                                <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $v->landscape }}"
-                                                                    alt=""></a>
+                                                                href="{{ route('mood.show.details', ['id' => App\Helpers\VideoHelper::encryptID($v->id), 'category_id' => $id]) }}">
+                                                                <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{ $v->landscape }}"
+                                                                    alt="{{ $v->landscape_image }}"></a>
                                                         </div>
                                                         <div class="alpha-card-large {{ $v->trailer_url ? 'movie-card' : '' }}"
                                                             id="movie-card">
-                                                            <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $v->landscape }}"
-                                                                class="thumbnail" id="thumbnail" alt="">
+                                                            <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{ $v->landscape }}"
+                                                                class="thumbnail" id="thumbnail" alt="{{ $v->landscape_image }}">
                                                             <video class="video-holder" loop muted id="video-holder">
                                                                 <source src="{{ $v->trailer_url }}" type="video/mp4">
                                                             </video>
@@ -102,13 +103,13 @@
                                                                     <div class="button-holder row">
                                                                         <div class="col-9">
                                                                             <a
-                                                                                href="{{ route('view.details', ['name' => $v->name, 'id' => App\Helpers\VideoHelper::encryptID($v->id)]) }}">
+                                                                                href="{{ route('mood.show.details', ['id' => App\Helpers\VideoHelper::encryptID($v->id) , 'category_id' => $id]) }}">
                                                                                 <button class="btn-watchnow" type="button">
                                                                                     <i class="fa-solid fa-play"></i>&nbsp;&nbsp;
                                                                                     Watch Now</button></a>
                                                                         </div>
                                                                         <div class="col-3">
-                                                                        @include('watchlist-button', ['id' => $v->id, 'type' => 'video', 'watchlist' => $watchlist])
+                                                                        @include('watchlist-button', ['id' => $v->id, 'type_id' => $v->type_id, 'category_id' => $v->category_id, 'type' => 'video', 'watchlist' => $watchlist])
                                                                         </div>
                                                                     </div>
                                                                     <ul class="animate__animated animate__fadeInUp mt-3">

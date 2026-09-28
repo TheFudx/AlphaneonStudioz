@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Khulps Play
+    {{ config('app.project_name') }} | Khulps Play
 @endsection
 @section('styles')
     <!-- Swiper CSS -->
@@ -231,7 +231,7 @@
                                                 document.addEventListener('DOMContentLoaded', () => {
                                                     const videoElement = document.getElementById("shorts-player-{{ $loop->index }}");
                                                     const source =
-                                                        `https://alphastudioz.in/admin_panel/public/storage/kluphs/{{ $video->transcoded_video_path }}/master.m3u8`;
+                                                        `{{ config('app.website_url') }}admin_panel/public/storage/kluphs/{{ $video->transcoded_video_path }}/master.m3u8`;
                                                     if (Hls.isSupported()) {
                                                         const hls = new Hls();
                                                         hls.loadSource(source);
@@ -279,7 +279,7 @@
                                                                         class="profile-img img-fluid" alt="Profile Picture">
                                                                 @else
                                                                     <img src="{{ url('/') }}/asset/images/profile.png"
-                                                                        class="profile-img img-fluid" alt="">
+                                                                        class="profile-img img-fluid" alt="profile.png">
                                                                 @endif
                                                             </div>
                                                             <div class="ms-2 d-flex align-items-center">

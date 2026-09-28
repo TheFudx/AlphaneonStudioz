@@ -23,6 +23,13 @@ class User extends Authenticatable
         'password',
         'mobile_no',
         'type',
+        'apple_user_identifier',
+        'subscription',
+        'razorpay_subscription_id',
+        'subscription_end_date',
+        'cancelled_at',
+        'is_deleted',
+        'profile_picture'
     ];
 
     /**

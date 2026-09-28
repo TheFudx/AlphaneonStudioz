@@ -1,7 +1,7 @@
 
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Device Limit
+    {{ config('app.project_name') }} | Device Limit
 @endsection
 <style>
     .btn-logout {
@@ -59,7 +59,7 @@
                                                                 <div class="row">
                                                                     <div class="col-9">
                                                                         {{-- <p class="text-light">{{ getActualDeviceNameAndBrowserFromUserAgent($item->device_name) }}</p> --}}
-                                                                        <p class="text-light">{{ $item->browser }} |  {{$item->platform}} | {{$item->platform_version}} | {{    $item->device_type }}</p>
+                                                                        <p class="text-light">{{ $item->device_name }} |  {{$item->device_type}} | {{$item->device_ip}} </p>
                                                                     </div>
                                                                     <div class="col-3">
                                                                         {{-- <button class="btn-logout">Logout</button> --}}

@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use App\Models\Cast;
+use App\Models\Season;
+use App\Models\Series;
+use App\Models\Category;
+use App\Models\Language;
 
 class Episodes extends Model
 {
@@ -54,6 +59,10 @@ class Episodes extends Model
     protected $fillable = [
         'release_date',
         'release_year',
+        'episode_320_url',
+'episode_480_url',
+'episode_720_url',
+'episode_1080_url'
         // other attributes...
     ];
     public function scopeActive(Builder $query): Builder
@@ -63,5 +72,26 @@ class Episodes extends Model
     public function type()
     {
         return $this->belongsTo(Type::class, 'type_id');
+    }
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+    public function series()
+    {
+        return $this->belongsTo(Series::class);
+    }
+    public function season()
+    {
+        return $this->belongsTo(Season::class);
+    }
+    public function language()
+    {
+        return $this->belongsTo(Language::class);
+    }
+    public function getCastAttribute()
+    {
+        $castIds = array_filter(explode(',', $this->cast_id));
+        return Cast::whereIn('id', $castIds)->get();
     }
 }

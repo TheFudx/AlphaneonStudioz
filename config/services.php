@@ -35,5 +35,20 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URL'),
     ],
+    'apple' => [
+        'client_id' => env('APPLE_CLIENT_ID'),
+        'client_secret' => App\Helpers\AppleJwtGenerator::generate(),
+        'redirect' => env('APPLE_REDIRECT_URI'),
+        'team_id' => env('APPLE_TEAM_ID'),
+        'key_id' => env('APPLE_KEY_ID'),
+        'private_key' => env('APPLE_PRIVATE_KEY'), // Ensure this is loaded correctly
+    ],
+
+    'bunny_khlup' => [
+        'storage_zone' => env('BUNNY_KHLUP_STORAGE_ZONE', 'alphaneonstudioz'),
+        'access_key' => env('BUNNY_KHLUP_ACCESS_KEY', '483afefd-9e1a-42a0-be8e9032335f-3db5-46eb'),
+        'endpoint' => env('BUNNY_KHLUP_ENDPOINT', 'https://storage.bunnycdn.com/alphaneonstudioz'),
+        'cdn_url' => env('BUNNY_KHLUP_CDN_URL', 'https://alphaneon.b-cdn.net'),
+    ],
 
 ];

@@ -33,6 +33,9 @@ class Kluphs extends Model
 'release_year',
 'imdb_rating',
 'view',
+'likes',
+'comments',
+'shares',
 'status'
     ];
     // protected $casts = [

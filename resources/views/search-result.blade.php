@@ -1,26 +1,32 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Search
+    {{ config('app.project_name') }} | Search
 @endsection
+
 @section('main-section')
-    <style>
+     <style>
+        /* Search bar styles */
         .search-bar {
-            background-color: #242631;
-            /* Dark background */
+            background: #242631;
             border-radius: 8px;
             padding: 10px 15px;
             display: flex;
             align-items: center;
             width: 100%;
-            max-width: 100%;
             color: #aaa;
+            position: relative;
         }
 
         .search-bar i {
-            font-size: 18px;
+            font-size: 20px;
             margin-right: 10px;
             color: #8e8e9c;
-            font-size: 20px;
+        }
+
+        .search-bar i.fa-times {
+            margin-right: 0;
+            margin-left: 10px;
+            cursor: pointer;
         }
 
         .search-bar input {
@@ -36,622 +42,519 @@
             opacity: 0.3;
         }
 
-        /* search result  */
-        #searchResultsNew {
-            /* position: absolute; */
-            /* background: #151515; */
-            color: white;
-            padding: 20px;
-            margin-left: 5%;
-            margin-top: 4px;
-            width: 90%;
-            max-width: 90%;
-            align-items: center;
-            height: 300px;
-            /* Or set a fixed height for a scrollbar to appear consistently */
-            /* top: 200px; */
-            /* left: 8%; */
+        /* Dropdown styles */
+        #searchDropdown {
             display: none;
-            overflow: auto;
-            /* This is the key property */
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: #1a1b27;
+            border: 1px solid #FF4B2B;
+            border-radius: 8px;
+            max-height: 500px;
+            overflow-y: auto;
+            z-index: 999;
         }
 
-        #searchResultsNew .search-result-new {
-            border-bottom: 1px solid #B01803;
-            padding-top: 15px;
+        #searchDropdown::-webkit-scrollbar {
+            width: 6px;
         }
 
-        #searchResultsNew .search-result-new a {
-            color: #FFFFFF;
+        #searchDropdown::-webkit-scrollbar-track {
+            background: #1a1b27;
+        }
+
+        #searchDropdown::-webkit-scrollbar-thumb {
+            background: #FF4B2B;
+            border-radius: 3px;
+        }
+
+        .dropdown-item-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            gap: 12px;
+            border-bottom: 1px solid #2a2b38;
+            cursor: pointer;
+            transition: background .15s;
             text-decoration: none;
         }
 
-        #searchResultsNew .search-result-new h3 {
-            font-size: 18px;
+        .dropdown-item-row:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item-row:hover {
+            background: #242631;
+        }
+
+        .dropdown-item-row img {
+            width: 44px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .dropdown-item-row .d-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .dropdown-item-row .d-info h4 {
+            font-size: 14px;
+            color: #fff;
+            margin: 0 0 3px;
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        #searchResultsNew .search-result-new p {
-            font-size: 13px;
+        .dropdown-item-row .d-info p {
+            font-size: 12px;
+            color: #888;
+            margin: 0;
         }
 
+        .dropdown-item-row .type-badge {
+            font-size: 10px;
+            background: #FF4B2B;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .type-badge.video { background: #007bff; }
+        .type-badge.show { background: #28a745; }
+        .type-badge.series { background: #ffc107; color: #000; }
+        .type-badge.episode { background: #17a2b8; }
+        .type-badge.category { background: #6f42c1; }
+        .type-badge.season { background: #fd7e14; }
+
+        /* Trending Section */
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .trending-item {
+            background: #1a1b27;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .trending-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        }
+
+        .trending-item .image-wrapper {
+            position: relative;
+            overflow: hidden;
+            padding-top: 56.25%;
+            background: #2a2b38;
+        }
+
+        .trending-item .image-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .trending-item .image-wrapper .type-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #FF4B2B;
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .trending-item .info {
+            padding: 12px;
+        }
+
+        .trending-item .info h5 {
+            color: #fff;
+            font-size: 14px;
+            margin: 0 0 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .trending-item .info .subtitle {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .trending-item .info .views {
+            color: #666;
+            font-size: 11px;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        /* Responsive */
         @media (max-width: 540px) {
-            #searchResultsNew {
-                width: 100%;
-            }
-
             .search-bar input {
                 font-size: 15px;
             }
-
-            #searchResultsNew .search-result-new h3 {
-                font-size: 10px;
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
             }
-
-            #searchResultsNew .search-result-new p {
-                font-size: 9px;
-            }
-
-            #searchResultsNew .search-result-new ul li {
-                font-size: 9px;
+            .dropdown-item-row img {
+                width: 36px;
+                height: 48px;
             }
         }
 
-        @media (max-width: 767.98px) {
-            #searchResultsNew .search-result-new h3 {
-                font-size: 10px;
-            }
-
-            #searchResultsNew .search-result-new p {
-                font-size: 9px;
-            }
-
-            #searchResultsNew .search-result-new ul li {
-                font-size: 9px;
-            }
+        .no-results {
+            color: #888;
+            text-align: center;
+            padding: 40px 20px;
         }
 
-        /* Or dynamically calculate this based on #searchResultsNew height */
-        /* .footer-pushed-down {
-                margin-top: 350px !important;
-            } */
+        .no-results i {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+        }
+
+        .loading-spinner i {
+            font-size: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .dropdown-section-title {
+            padding: 8px 14px;
+            color: #666;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #2a2b38;
+            background: #14151f;
+        }
+
+        .highlight {
+            color: #FF4B2B;
+            font-weight: bold;
+        }
     </style>
-    @php
-        if (isset($_GET['keyword'])) {
-            $value = $_GET['keyword'];
-        } else {
-            $value = '';
-        }
-    @endphp
+
     <section id="section-home-newdes" class="podcast mt-5 pt-5 mb-5">
         <div class="home-newdes-section">
             <div class="home-newdes-section-container">
                 <div class="container-fluid mt-2">
-                    <form action="{{ route('search') }}" method="GET">
-                        <div class="search-bar mx-auto">
-                            <i class="fas fa-search"></i>
-                            <input type="text" name="keyword" id="searchInputNew" value="{{ $value }}"
-                                placeholder="Movies, shows and more" autocomplete="off">
-                            <i class="fa fa-times" aria-hidden="true" onclick="ClearInput();"></i>
+
+                    {{-- Search Bar --}}
+                    <div class="search-bar mx-auto" style="position:relative;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search Podcasts, Series, Movies, Music, Short films" autocomplete="off">
+                        <i class="fa fa-times" id="clearBtn" aria-hidden="true" style="display:none;"></i>
+                        <div id="searchDropdown"></div>
+                    </div>
+
+                    {{-- Trending Section --}}
+                    <div id="trendingSection">
+                        <h4 class="text-white mt-4 mb-3">🔥 Trending Now</h4>
+                        <div id="trendingContent" class="trending-grid">
+                            <div class="loading-spinner">
+                                <i class="fas fa-spinner"></i>
+                                <p style="margin-top:10px;">Loading trending content...</p>
+                            </div>
                         </div>
-                    </form>
-                    <div id="searchResultsNew" class="bg-dark">
-                        <!-- Search results will be displayed here -->
                     </div>
-                    <div class="col-12 text-center" id="searchimageDiv">
-                        {{-- Add your vector image here --}}
-                        <img src="{{ URL::to('asset/images/searching.png') }}" alt="Search" class="img-fluid"
-                            style="max-width: 300px; margin-top: 20px;">
-                        <h3 class="text-white mt-3">Ready to Discover Something New?</h3>
-                        <p class="text-white">Enter a movie title, a show, or a podcast to find your next favorite video!</p>
-                    </div>
-                    
+
                 </div>
             </div>
         </div>
     </section>
-    @if ($value != '')
-        {{-- trailers  --}}
-        @if (!empty($trailers) && count($trailers) > 0)
-            <section id="section-home-newdes" class="podcast ">
-                <div class="home-newdes-section">
-                    <div class="home-newdes-section-container">
-                        <div class="container-fluid">
-                            <div class="d-flex justify-content-between align-items-center pe-3">
-                                <span class="l-head">Search Result for Trailers</span>
-                                </p>
-                            </div>
-                            <div class="slider-container mt-4">
-                                <div class="latest-release-slider owl-carousel owl-theme" id="trailersupcoming">
-                                    @foreach ($trailers as $p)
-                                        <div class="item">
-                                            <div class="cards-container">
-                                                <div class="alpha-card skeleton">
-                                                    <div class="image-wrapper">
-                                                        <a
-                                                            href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($p->id)]) }}"><img
-                                                                src="https://alphastudioz.in/admin_panel/public/images/video/{{ $p->landscape }}"
-                                                                alt=""></a>
-                                                    </div>
-                                                    <div class="alpha-card-large {{ $p->trailer_url ? 'movie-card' : '' }}"
-                                                        id="movie-card">
-                                                        <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $p->landscape }}"
-                                                            class="thumbnail" id="thumbnail" alt="">
-                                                        <video class="video-holder" loop muted id="video-holder">
-                                                            <source src="{{ $p->trailer_url }}" type="video/mp4">
-                                                        </video>
-                                                        <div class="content-holder pt-5">
-                                                            {{-- <img src="{{url('/')}}/asset/images/tere-sang.png" class="title mt-5" alt=""> --}}
-                                                            <div class="content">
-                                                                <div class="button-holder row">
-                                                                    <div class="col-9">
-                                                                        <a
-                                                                            href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($p->id)]) }}">
-                                                                            <button class="btn-watchnow" type="button">
-                                                                                <i class="fa-solid fa-play"></i>&nbsp;&nbsp;
-                                                                                Watch Now</button></a>
-                                                                    </div>
-                                                                    <div class="col-3">
-                                                                        @include('watchlist-button', [
-                                                                            'id' => $p->id,
-                                                                            'type' => 'video',
-                                                                            'watchlist' => $watchlist,
-                                                                        ])
-                                                                    </div>
-                                                                </div>
-                                                                <ul class="animate__animated animate__fadeInUp mt-3">
-                                                                    <li>{{ \Carbon\Carbon::parse($p->release_date)->format('Y') }}
-                                                                    </li>
-                                                                    <li>&#x2022;</li>
-                                                                    <li>
-                                                                        @if ($p->video_duration)
-                                                                            {{ MillisecondsToTime($p->video_duration) }}
-                                                                        @else
-                                                                            -
-                                                                        @endif
-                                                                    </li>
-                                                                    <li>&#x2022;</li>
-                                                                    <li> {{ $p->language_name }}</li>
-                                                                </ul>
-                                                                <p class="mt-3 mb-4 animate__animated animate__fadeInUp">
-                                                                    {{ Str::words(strip_tags($p->description), 15, '...') }}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        @endif
-        {{-- podcast  --}}
-        @if (!empty($podcast) && count($podcast) > 0)
-            <section id="section-home-newdes" class="podcast ">
-                <div class="home-newdes-section">
-                    <div class="home-newdes-section-container">
-                        <div class="container-fluid">
-                            <div class="d-flex justify-content-between align-items-center pe-3">
-                                <span class="l-head">Search Result for Podcast</span>
-                            </div>
-                            <div class="slider-container mt-4">
-                                <div class="latest-release-slider owl-carousel owl-theme" id="podcastslider">
-                                    @foreach ($podcast as $p)
-                                        <div class="item">
-                                            <div class="cards-container">
-                                                <div class="alpha-card skeleton">
-                                                    <div class="image-wrapper">
-                                                        <a
-                                                            href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($p->id)]) }}"><img
-                                                                src="https://alphastudioz.in/admin_panel/public/images/video/{{ $p->landscape }}"
-                                                                alt=""></a>
-                                                    </div>
-                                                    <div class="alpha-card-large {{ $p->trailer_url ? 'movie-card' : '' }}"
-                                                        id="movie-card">
-                                                        <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $p->landscape }}"
-                                                            class="thumbnail" id="thumbnail" alt="">
-                                                        <video class="video-holder" loop muted id="video-holder">
-                                                            <source src="{{ $p->trailer_url }}" type="video/mp4">
-                                                        </video>
-                                                        <div class="content-holder pt-5">
-                                                            {{-- <img src="{{url('/')}}/asset/images/tere-sang.png" class="title mt-5" alt=""> --}}
-                                                            <div class="content">
-                                                                <div class="button-holder row">
-                                                                    <div class="col-9">
-                                                                        <a
-                                                                            href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($p->id)]) }}">
-                                                                            <button class="btn-watchnow" type="button">
-                                                                                <i
-                                                                                    class="fa-solid fa-play"></i>&nbsp;&nbsp;
-                                                                                Watch Now</button></a>
-                                                                    </div>
-                                                                    <div class="col-3">
-                                                                        @include('watchlist-button', [
-                                                                            'id' => $p->id,
-                                                                            'type' => 'video',
-                                                                            'watchlist' => $watchlist,
-                                                                        ])
-                                                                    </div>
-                                                                </div>
-                                                                <ul class="animate__animated animate__fadeInUp mt-3">
-                                                                    <li>{{ \Carbon\Carbon::parse($p->release_date)->format('Y') }}
-                                                                    </li>
-                                                                    <li>&#x2022;</li>
-                                                                    <li>
-                                                                        @if ($p->video_duration)
-                                                                            {{ MillisecondsToTime($p->video_duration) }}
-                                                                        @else
-                                                                            -
-                                                                        @endif
-                                                                    </li>
-                                                                    <li>&#x2022;</li>
-                                                                    <li> {{ $p->language_name }}</li>
-                                                                </ul>
-                                                                <p class="mt-3 mb-4 animate__animated animate__fadeInUp">
-                                                                    {{ Str::words(strip_tags($p->description), 15, '...') }}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        @endif
-        {{-- music --}}
-        @if (!empty($music) && count($music) > 0)
-            <section id="section-home-newdes" class="podcast ">
-                <div class="home-newdes-section">
-                    <div class="home-newdes-section-container">
-                        <div class="container-fluid">
-                            <div class="d-flex justify-content-between align-items-center pe-3">
-                                <span class="l-head">Search Result for Music </span>
-                            </div>
-                            <div class="slider-container mt-4">
-                                <div class="latest-release-slider owl-carousel owl-theme" id="musicsslider">
-                                    @foreach ($music as $songs)
-                                        <div class="item">
-                                            <div class="cards-container">
-                                                <div class="alpha-card skeleton">
-                                                    <div class="image-wrapper">
-                                                        <a
-                                                            href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($songs->id)]) }}"><img
-                                                                src="https://alphastudioz.in/admin_panel/public/images/video/{{ $songs->landscape }}"
-                                                                alt=""></a>
-                                                    </div>
-                                                    <div class="alpha-card-large {{ $songs->trailer_url ? 'movie-card' : '' }}"
-                                                        id="movie-card">
-                                                        <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $songs->landscape }}"
-                                                            class="thumbnail" id="thumbnail" alt="">
-                                                        <video class="video-holder" loop muted id="video-holder">
-                                                            <source
-                                                                src="https://alphastudioz.in/admin_panel/public/images/video/o_1i70n3m6f1ep61cbotslp6114eq1e.mp4"
-                                                                type="video/mp4">
-                                                        </video>
-                                                        <div class="content-holder pt-5">
-                                                            {{-- <img src="{{url('/')}}/asset/images/tere-sang.png" class="title mt-5" alt=""> --}}
-                                                            <div class="content">
-                                                                <div class="button-holder row">
-                                                                    <div class="col-9">
-                                                                        <a
-                                                                            href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($songs->id)]) }}">
-                                                                            <button class="btn-watchnow" type="button">
-                                                                                <i
-                                                                                    class="fa-solid fa-play"></i>&nbsp;&nbsp;
-                                                                                Watch Now</button></a>
-                                                                    </div>
-                                                                    <div class="col-3">
-                                                                        @include('watchlist-button', [
-                                                                            'id' => $songs->id,
-                                                                            'type' => 'video',
-                                                                            'watchlist' => $watchlist,
-                                                                        ])
-                                                                    </div>
-                                                                </div>
-                                                                <ul class="animate__animated animate__fadeInUp mt-3">
-                                                                    <li>{{ \Carbon\Carbon::parse($songs->release_date)->format('Y') }}
-                                                                    </li>
-                                                                    <li>&#x2022;</li>
-                                                                    <li>
-                                                                        @if ($songs->video_duration)
-                                                                            {{ MillisecondsToTime($songs->video_duration) }}
-                                                                        @else
-                                                                            -
-                                                                        @endif
-                                                                    </li>
-                                                                    <li>&#x2022;</li>
-                                                                    <li> {{ $songs->language_name }}</li>
-                                                                </ul>
-                                                                <p class="mt-3 mb-4 animate__animated animate__fadeInUp">
-                                                                    {{ Str::words(strip_tags($songs->description), 15, '...') }}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        @endif
-        {{-- webseries --}}
-        @if (!empty($series) && count($series) > 0)
-            <section id="section-home-newdes" class="podcast ">
-                <div class="home-newdes-section">
-                    <div class="home-newdes-section-container">
-                        <div class="container-fluid">
-                            <div class="d-flex justify-content-between align-items-center pe-3">
-                                <span class="l-head">Search Result for Web Series </span>
-                            </div>
-                            <div class="slider-container mt-4">
-                                <div class="latest-release-slider owl-carousel owl-theme" id="webseriesslider">
-                                    @foreach ($series as $item)
-                                        <div class="item">
-                                            <div class="cards-container">
-                                                <div class="alpha-card skeleton">
-                                                    <div class="image-wrapper">
-                                                        <a
-                                                            href="{{ route('webseries.view', ['id' => App\Helpers\VideoHelper::encryptID($item->id)]) }}"><img
-                                                                src="https://alphastudioz.in/admin_panel/public/images/series/{{ $item->landscape_image }}"
-                                                                alt=""></a>
-                                                    </div>
-                                                    <div class="alpha-card-large {{ $item->trailer_url ? 'movie-card' : '' }}"
-                                                        id="movie-card">
-                                                        <img src="https://alphastudioz.in/admin_panel/public/images/series/{{ $item->landscape_image }}"
-                                                            class="thumbnail" id="thumbnail" alt="">
-                                                        <video class="video-holder" loop muted id="video-holder">
-                                                            <source src="{{ $item->trailer_url }}" type="video/mp4">
-                                                        </video>
-                                                        <div class="content-holder pt-5">
-                                                            {{-- <img src="{{url('/')}}/asset/images/tere-sang.png" class="title mt-5" alt=""> --}}
-                                                            <div class="content">
-                                                                <div class="button-holder row">
-                                                                    <div class="col-9">
-                                                                        <a
-                                                                            href="{{ route('webseries.view', ['id' => App\Helpers\VideoHelper::encryptID($item->id)]) }}">
-                                                                            <button class="btn-watchnow" type="button">
-                                                                                <i
-                                                                                    class="fa-solid fa-play"></i>&nbsp;&nbsp;
-                                                                                Watch Now</button></a>
-                                                                    </div>
-                                                                    <div class="col-3">
-                                                                        @include('watchlist-button', [
-                                                                            'id' => $item->id,
-                                                                            'type' => 'series',
-                                                                            'watchlist' => $watchlist,
-                                                                        ])
-                                                                    </div>
-                                                                </div>
-                                                                <ul class="animate__animated animate__fadeInUp mt-3">
-                                                                    <li>{{ \Carbon\Carbon::parse($item->release_date)->format('Y') }}
-                                                                    </li>
-                                                                    <li>&#x2022;</li>
-                                                                    <li>
-                                                                        @if ($item->video_duration)
-                                                                            {{ MillisecondsToTime($item->video_duration) }}
-                                                                        @else
-                                                                            -
-                                                                        @endif
-                                                                    </li>
-                                                                    <li>&#x2022;</li>
-                                                                    <li> {{ $item->language_name }}</li>
-                                                                </ul>
-                                                                <p class="mt-3 mb-4 animate__animated animate__fadeInUp">
-                                                                    {{ Str::words(strip_tags($item->description), 15, '...') }}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        @endif
-        @if (!empty($video) && count($video) > 0)
-            <section id="section-home-newdes" class="podcast ">
-                <div class="home-newdes-section">
-                    <div class="home-newdes-section-container">
-                        <div class="container-fluid">
-                            <div class="d-flex justify-content-between align-items-center pe-3">
-                                <span class="l-head">Search Result for Movies</span>
-                            </div>
-                            <div class="slider-container mt-4">
-                                <div class="latest-release-slider owl-carousel owl-theme" id="moviesliderhome">
-                                    @foreach ($video as $podcast)
-                                        <div class="item">
-                                            <div class="cards-container">
-                                                <div class="alpha-card skeleton">
-                                                    <div class="image-wrapper">
-                                                        <a
-                                                            href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($podcast->id)]) }}"><img
-                                                                src="https://alphastudioz.in/admin_panel/public/images/video/{{ $podcast->landscape }}"
-                                                                alt=""></a>
-                                                    </div>
-                                                    <div class="alpha-card-large {{ $podcast->trailer_url ? 'movie-card' : '' }}"
-                                                        id="movie-card">
-                                                        <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $podcast->landscape }}"
-                                                            class="thumbnail" id="thumbnail" alt="">
-                                                        <video class="video-holder" loop muted id="video-holder">
-                                                            <source src="{{ $podcast->trailer_url }}" type="video/mp4">
-                                                        </video>
-                                                        <div class="content-holder pt-5">
-                                                            {{-- <img src="{{url('/')}}/asset/images/tere-sang.png" class="title mt-5" alt=""> --}}
-                                                            <div class="content">
-                                                                <div class="button-holder row">
-                                                                    <div class="col-9">
-                                                                        <a
-                                                                            href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($podcast->id)]) }}">
-                                                                            <button class="btn-watchnow" type="button">
-                                                                                <i
-                                                                                    class="fa-solid fa-play"></i>&nbsp;&nbsp;
-                                                                                Watch Now</button></a>
-                                                                    </div>
-                                                                    <div class="col-3">
-                                                                        @include('watchlist-button', [
-                                                                            'id' => $podcast->id,
-                                                                            'type' => 'video',
-                                                                            'watchlist' => $watchlist,
-                                                                        ])
-                                                                    </div>
-                                                                </div>
-                                                                <ul class="animate__animated animate__fadeInUp mt-3">
-                                                                    <li>{{ \Carbon\Carbon::parse($podcast->release_date)->format('Y') }}
-                                                                    </li>
-                                                                    <li>&#x2022;</li>
-                                                                    <li>
-                                                                        @if ($podcast->video_duration)
-                                                                            {{ MillisecondsToTime($podcast->video_duration) }}
-                                                                        @else
-                                                                            -
-                                                                        @endif
-                                                                    </li>
-                                                                    <li>&#x2022;</li>
-                                                                    <li> {{ $podcast->language_name }}</li>
-                                                                </ul>
-                                                                <p class="mt-3 mb-4 animate__animated animate__fadeInUp">
-                                                                    {{ Str::words(strip_tags($podcast->description), 15, '...') }}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        @endif
-    @endif
+
     <script>
-        function ClearInput() {
-            let url = new URL(window.location.href);
-            let params = new URLSearchParams(url.search);
-            params.delete('keyword');
-            url.search = params.toString();
-            window.history.replaceState({}, document.title, url);
-            $("#searchInputNew").val('');
-            $('.footer-section').addClass('footer-pushed-down');
-            window.location.reload();
-        }
         $(document).ready(function() {
-            let url = new URL(window.location.href);
-            let params = new URLSearchParams(url.search);
-            if (params.has('keyword') && params.get('keyword').trim() !== '') {
-                $('.footer-section').removeClass('footer-pushed-down');
-            } else {
-                $('.footer-section').addClass('footer-pushed-down');
-            }
-            $('#searchInputNew').keyup(function() {
-                var keyword = $(this).val();
-                if (keyword.trim() != '') {
-                    $('#searchimageDiv').hide();
-                    $('#searchResultsNew').show();
-                    $('.footer-section').removeClass('footer-pushed-down');
-                    // Make an Ajax request to your Laravel route to fetch search results
-                    $.ajax({
-                        url: `{{ route('search') }}`, // Replace with your Laravel route for search
-                        method: 'GET',
-                        data: {
-                            keyword: keyword
-                        },
-                        success: function(response) {
-                            // Update the UI with search results
-                            displayResultsNew(response);
-                        },
-                        error: function(xhr, status, error) {
-                            console.error(xhr.responseText);
-                        }
-                    });
+            let searchTimeout;
+            const searchInput = $('#searchInput');
+            const searchDropdown = $('#searchDropdown');
+            const clearBtn = $('#clearBtn');
+            const trendingContent = $('#trendingContent');
+
+            // Load trending content on page load
+            loadTrendingContent();
+
+            // Search functionality
+            searchInput.on('input', function() {
+                const query = $(this).val().trim();
+                
+                if (query.length >= 2) {
+                    clearBtn.show();
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        performSearch(query);
+                    }, 300);
                 } else {
-                    $('#searchimageDiv').show();
-                    $('#searchResultsNew').hide();
-                    $('.footer-section').addClass('footer-pushed-down');
+                    clearBtn.hide();
+                    searchDropdown.hide();
+                    if (query.length === 0) {
+                        loadTrendingContent();
+                    }
                 }
             });
 
-            function displayResultsNew(results) {
-                var html = '';
-                results.forEach(function(result) {
-                    var description = result.description;
-                    if (description.length > 50) {
-                        description = description.substring(0, 50) + '...';
-                    }
-                    html += '<div class="search-result-new">';
-                    html += '<a href="' + getURLNew(result) + '">';
-                    html += '<div class="row">';
-                    // html += '<div class="col-3">';
-                    // html += '<img src="https://alphastudioz.in/admin_panel/public/images/video/'+ result.thumbnail + '" height="100px" width="auto">';
-                    // html += '</div>';
-                    html += '<div class="col-9">';
-                    html += '<h3>' + result.name + '</h3>';
-                    html += '<p>' + description + '</p>';
-                    html += '</div>';
-                    html += '</div>';
-                    html += '</a>';
-                    html += '</div>';
-                });
-                if (results.length === 0) {
-                    html = '<p>No Such Result found</p>';
+            // Clear button
+            clearBtn.on('click', function() {
+                searchInput.val('');
+                clearBtn.hide();
+                searchDropdown.hide();
+                loadTrendingContent();
+                searchInput.focus();
+            });
+
+            // Close dropdown on outside click
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.search-bar').length) {
+                    searchDropdown.hide();
                 }
-                $('#searchResultsNew').html(html);
+            });
+
+            // Perform search
+            function performSearch(query) {
+                $.ajax({
+                    url: '{{ route("search.ajax") }}',
+                    method: 'GET',
+                    data: { query: query },
+                    beforeSend: function() {
+                        searchDropdown.html(`
+                            <div class="loading-spinner">
+                                <i class="fas fa-spinner"></i>
+                                <p style="margin-top:10px;">Searching...</p>
+                            </div>
+                        `);
+                        searchDropdown.show();
+                    },
+                    success: function(data) {
+                        if (data.length > 0) {
+                            let html = '';
+                            
+                            // Group results by type
+                            const grouped = {};
+                            data.forEach(item => {
+                                if (!grouped[item.type]) {
+                                    grouped[item.type] = [];
+                                }
+                                grouped[item.type].push(item);
+                            });
+
+                            // Sort types for display
+                            const typeOrder = ['Upcoming', 'Music', 'Movies', 'Trailer', 'Short Films', 'Series', 'Podcast', 'Comedy Show', 'Episode', 'Category', 'Season'];
+                            const sortedTypes = Object.keys(grouped).sort((a, b) => {
+                                return typeOrder.indexOf(a) - typeOrder.indexOf(b);
+                            });
+
+                            sortedTypes.forEach(type => {
+                                html += `<div class="dropdown-section-title">${type}s</div>`;
+                                grouped[type].forEach(item => {
+                                    const imageHtml = item.image ? 
+                                        `<img src="${item.image}" alt="${item.title}" loading="lazy">` : 
+                                        `<div style="width:44px;height:60px;background:#2a2b38;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#666;font-size:20px;">
+                                            <i class="fas fa-${getIconForType(item.type)}"></i>
+                                        </div>`;
+                                    
+                                    html += `
+                                        <a href="${item.url}" class="dropdown-item-row">
+                                            ${imageHtml}
+                                            <div class="d-info">
+                                                <h4>${highlightText(item.title, query)}</h4>
+                                                <p>${item.subtitle || ''}</p>
+                                                <span class="type-badge ${item.type.toLowerCase()}">${item.type}</span>
+                                                ${item.views ? `<span style="color:#666;font-size:11px;margin-left:8px;">👁️ ${item.views}</span>` : ''}
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                            });
+
+                            searchDropdown.html(html);
+                            searchDropdown.show();
+                        } else {
+                            searchDropdown.html(`
+                                <div class="no-results">
+                                    <i class="fas fa-search"></i>
+                                    No results found for "<strong>${query}</strong>"
+                                    <p style="margin-top:10px;font-size:13px;color:#666;">Try different keywords or check your spelling</p>
+                                </div>
+                            `);
+                            searchDropdown.show();
+                        }
+                    },
+                    error: function() {
+                        searchDropdown.html(`
+                            <div class="no-results">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Error searching. Please try again.
+                            </div>
+                        `);
+                        searchDropdown.show();
+                    }
+                });
             }
 
-            function getURLNew(result) {
-                var id = result.id;
-                var type = result.type_id;
-                var url = '';
-                const viewDetailsRoute = "{{ route('view.details', ['id' => 'REPLACE_ID', 'watch' => true]) }}";
-                switch (type) {
-                    case 6:
-                        url = viewDetailsRoute.replace('REPLACE_ID', id);
-                        break;
-                    case 8:
-                        url = viewDetailsRoute.replace('REPLACE_ID', id);
-                        break;
-                    case 5:
-                        url = viewDetailsRoute.replace('REPLACE_ID', id);
-                        break;
-                    default:
-                        break;
-                }
-                return url;
+            // Helper function to highlight search term
+            function highlightText(text, query) {
+                if (!text) return '';
+                const regex = new RegExp(`(${query})`, 'gi');
+                return text.replace(regex, '<span class="highlight">$1</span>');
             }
-            // $(document).on('click', function(event) {
-            //     if (!$(event.target).closest('.search-bar, #searchResultsNew').length) {
-            //         $('#searchResultsNew').hide();
-            //         $('.footer-section').removeClass('footer-pushed-down');
-            //     }
-            // });
-            // if ($("#searchInputNew").val().trim() === '') {
-            //     $('#searchResultsNew').hide();
-            //     $('.footer-section').removeClass('footer-pushed-down');
-            // }
+
+            // Get icon for content type
+            function getIconForType(type) {
+                const icons = {
+                    'upcoming': 'clock',
+                    'music': 'music',
+                    'movies': 'film',
+                    'trailer': 'video',
+                    'short films': 'film',
+                    'series': 'layer-group',
+                    'podcast': 'microphone',
+                    'comedy show': 'laugh',
+                    'episode': 'play-circle',
+                    'category': 'folder',
+                    'season': 'calendar-alt'
+                };
+                return icons[type.toLowerCase()] || 'file';
+            }
+
+            // Load trending content
+            function loadTrendingContent() {
+                trendingContent.html(`
+                    <div class="loading-spinner" style="grid-column:1/-1;">
+                        <i class="fas fa-spinner"></i>
+                        <p style="margin-top:10px;">Loading trending content...</p>
+                    </div>
+                `);
+                
+                $.ajax({
+                    url: '{{ route("search.trending") }}',
+                    method: 'GET',
+                    success: function(data) {
+                        if (data.length > 0) {
+                            let html = '';
+                            data.forEach(item => {
+                                const imageHtml = item.image ? 
+                                    `<img src="${item.image}" alt="${item.title}" loading="lazy">` : 
+                                    `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#666;font-size:30px;">
+                                        <i class="fas fa-${getIconForType(item.type)}"></i>
+                                    </div>`;
+                                
+                                html += `
+                                    <div class="trending-item" onclick="window.location.href='${item.url}'">
+                                        <div class="image-wrapper">
+                                            ${imageHtml}
+                                            <span class="type-badge">${item.type}</span>
+                                        </div>
+                                        <div class="info">
+                                            <h5 title="${item.title}">${item.title}</h5>
+                                            <div class="subtitle">${item.subtitle || ''}</div>
+                                            ${item.views ? `<div class="views">👁️ ${item.views} views</div>` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            trendingContent.html(html);
+                        } else {
+                            trendingContent.html(`
+                                <div class="no-results" style="grid-column:1/-1;">
+                                    <i class="fas fa-fire"></i>
+                                    No trending content available
+                                </div>
+                            `);
+                        }
+                    },
+                    error: function() {
+                        trendingContent.html(`
+                            <div class="no-results" style="grid-column:1/-1;">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Could not load trending content
+                            </div>
+                        `);
+                    }
+                });
+            }
+
+            // Keyboard navigation for dropdown
+            searchInput.on('keydown', function(e) {
+                const items = searchDropdown.find('.dropdown-item-row');
+                
+                if (e.key === 'ArrowDown' && items.length) {
+                    e.preventDefault();
+                    const current = items.filter('.active');
+                    if (current.length) {
+                        current.removeClass('active');
+                        const next = current.next('.dropdown-item-row');
+                        if (next.length) {
+                            next.addClass('active');
+                            next[0].scrollIntoView({ block: 'nearest' });
+                        }
+                    } else {
+                        items.first().addClass('active');
+                    }
+                } else if (e.key === 'ArrowUp' && items.length) {
+                    e.preventDefault();
+                    const current = items.filter('.active');
+                    if (current.length) {
+                        current.removeClass('active');
+                        const prev = current.prev('.dropdown-item-row');
+                        if (prev.length) {
+                            prev.addClass('active');
+                            prev[0].scrollIntoView({ block: 'nearest' });
+                        }
+                    } else {
+                        items.last().addClass('active');
+                    }
+                } else if (e.key === 'Enter') {
+                    const active = items.filter('.active');
+                    if (active.length) {
+                        window.location.href = active.attr('href');
+                    } else if (items.length === 1) {
+                        window.location.href = items.attr('href');
+                    }
+                } else if (e.key === 'Escape') {
+                    searchDropdown.hide();
+                    searchInput.blur();
+                }
+            });
         });
     </script>
+
+    <script src="{{ URL::to('asset/js/gridView.js') }}"></script>
 @endsection

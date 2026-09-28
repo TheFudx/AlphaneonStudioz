@@ -60,7 +60,7 @@ try {
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 587;
 
-    $mail->setFrom('info@alphastudioz.in', 'Alphastudioz IT Media Pvt Ltd');
+    $mail->setFrom('info@alphastudioz.in', config('app.project_name') . 'IT Media Pvt Ltd');
     $mail->addAddress($user['email'], 'User');
 
     $mail->isHTML(true);

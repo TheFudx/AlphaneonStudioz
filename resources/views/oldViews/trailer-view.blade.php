@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Movie Details
+    {{ config('app.project_name') }} | Movie Details
 @endsection
 @section('main-section')
 
@@ -9,9 +9,9 @@
     <section id="innerBanners" class="inner-banner">
         <div class="inner-banner-section">
             <div class="inner-banner-holder {{ app('logged-in-user')->subscription == 'Yes' ? 'd-none' : 'd-block' }}">
-                <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $video->landscape }}"
+                <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{ $video->landscape }}"
                     class="inner-landscape" width="100%" alt="">
-                <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $video->thumbnail }}"
+                <img src="{{ config('app.website_url') }}admin_panel/public/images/video/{{ $video->thumbnail }}"
                     class="inner-thumbnail" width="100%" alt="">
                 <div class="overlay position-absolute">
                     <div class="movie-short-description ">
@@ -41,8 +41,8 @@
                                     <p class="mb-2 mt-2">{{ Str::words(strip_tags($video->description), 20, '...') }}</p>
                                     <div class="d-flex position-relative">
                                         @if (app('logged-in-user')->subscription == 'No')
-                                            <a href="{{ route('subscribe') }}">
-                                                <button type="button" class="btn-watchnow "> <svg width="11"
+                                            <a href="#">
+                                                <button type="button" class="btn-watchnow " onclick="openSubscriptionModal()"> <svg width="11"
                                                         height="14" viewBox="0 0 11 14" fill="#ffffff"
                                                         xmlns="http://www.w3.org/2000/svg">
                                                         <path
@@ -56,7 +56,7 @@
                                                     <i class="fa-solid fa-play"></i>&nbsp;&nbsp;Watch Now</button>
                                             </a>
                                         @endif
-                                        @include('watchlist-button', ['id' => $video->id, 'type' => 'video', 'watchlist' => $watchlist])
+                                        @include('watchlist-button', ['id' => $video->id, 'type_id' => $video->type_id, 'category_id' => $video->category_id, 'type' => 'video', 'watchlist' => $watchlist])
                                     </div>
                                 </div>
                             </div>
@@ -84,16 +84,16 @@
                         id="player" style="display: {{ app('logged-in-user')->subscription == 'Yes' ? 'block' : 'none' }};"
                         class="w-100">
                         <source
-                            src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->video_320) }}"
+                            src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->video_320) }}"
                             type="video/mp4" size="360">
                         <source
-                            src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->video_480) }}"
+                            src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->video_480) }}"
                             type="video/mp4" size="480">
                         <source
-                            src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->video_720) }}"
+                            src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->video_720) }}"
                             type="video/mp4" size="720">
                         <source
-                            src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->video_1080) }}"
+                            src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->video_1080) }}"
                             type="video/mp4" size="1080">
                         Your browser does not support the video tag.
                     </video>
@@ -105,16 +105,16 @@
                             poster="{{ $video->landscape_url }}" preload="auto"
                             style="display: {{ app('logged-in-user')->subscription == 'Yes' ? 'block' : 'none' }};">
                             <source
-                                src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->transcoded_video_path . '.mp4') }}"
+                                src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->transcoded_video_path . '.mp4') }}"
                                 type="video/mp4">
                             <source
-                                src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->transcoded_video_path . '.mp4') }}"
+                                src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->transcoded_video_path . '.mp4') }}"
                                 type="video/mp4">
                             <source
-                                src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->transcoded_video_path . '.mp4') }}"
+                                src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->transcoded_video_path . '.mp4') }}"
                                 type="video/mp4">
                             <source
-                                src="{{ asset('https://alphastudioz.in/admin_panel/public/images/video/' . $video->transcoded_video_path . '.mp4') }}"
+                                src="{{ asset(config('app.website_url') . 'admin_panel/public/images/video/' . $video->transcoded_video_path . '.mp4') }}"
                                 type="video/mp4">
                         </video>
                     @endif

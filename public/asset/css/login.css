@@ -186,6 +186,7 @@
      align-items: center;
      text-align: center;
      color: #686868;
+     margin-bottom: -21px;
  }
  .separator::before,
  .separator::after {
@@ -213,6 +214,16 @@
  }
  .login-icon-google {
      background-image: url("/asset/icons/Google-icon.png");
+     background-size: contain;
+     background-repeat: no-repeat;
+     background-position: center;
+     height: 24px;
+     width: 24px;
+     margin-right: 8px;
+     flex-shrink: 0;
+ }
+ .login-icon-apple {
+     background-image: url("/asset/icons/apple-logo.png");
      background-size: contain;
      background-repeat: no-repeat;
      background-position: center;

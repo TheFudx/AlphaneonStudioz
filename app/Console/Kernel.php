@@ -13,8 +13,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('subscriptions:check')->daily();
+        // $schedule->command('subscriptions:check')->daily();
         $schedule->command('app:devise-session-data-store')->everyMinute();
+        $schedule->command('fcm:clean-tokens')->everyMinute();
     }
 
     /**

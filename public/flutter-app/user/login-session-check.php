@@ -3,24 +3,36 @@
 
 
 include 'database.php';
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+if (mysqli_connect_errno()) {
+    echo "Failed to connect to MySQL: " . mysqli_connect_error();
+    exit(); // Stop execution if connection fails
+}
 // Get data from POST request
 $data = json_decode(file_get_contents('php://input'), true);
-$user_id = isset($data['user_id']) ? $data['email'] : null;
-$device_ip = isset($data['device_ip']) ? $data['password'] : null;
-$session_id = isset($_SERVER['session_id']) ? $_SERVER['HTTP_USER_AGENT'] : 'Unknown';
+$user_id = isset($data['user_id']) ? $data['user_id'] : null;
+$session_id = isset($data['session_id']) ? $data['session_id'] : null;
 
-
-if (empty($user_id)  || empty($device_ip) || empty($session_id)) {
+if (empty($user_id) ) {
     echo json_encode([
         "status" => "error",
-        "message" => "Please fill in all required fields",
+        "message" => "user_id field is  required.",
+    ]);
+    exit();
+}
+if(empty($session_id)){
+ echo json_encode([
+        "status" => "error",
+        "message" => "session_id field is  required.",
     ]);
     exit();
 }
 // Check if user exists
-$sqlQuery = mysqli_prepare($connectNow, "SELECT * FROM sessions WHERE user_id = ? AND ip_address = ? AND session_id = ?");
-mysqli_stmt_bind_param($sqlQuery, "sss", $user_id,$device_ip,$session_id);
+
+$sqlQuery = mysqli_prepare($connectNow, "SELECT * FROM sessions WHERE user_id = ? AND  id = ?");
+mysqli_stmt_bind_param($sqlQuery, "is",$user_id, $session_id);
 mysqli_stmt_execute($sqlQuery);
 $session_data = mysqli_stmt_get_result($sqlQuery);
 

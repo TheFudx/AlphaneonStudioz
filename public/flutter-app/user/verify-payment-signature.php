@@ -1,13 +1,22 @@
 <?php
 header('Content-Type: application/json');
+require __DIR__ . '/../../../vendor/autoload.php';
+$app = require_once __DIR__ . '/../../../bootstrap/app.php';
 
+use Illuminate\Support\Facades\Log;
+$app->make('Illuminate\Contracts\Http\Kernel')->handle(
+    Illuminate\Http\Request::capture()
+);
 // Get required values
 $razorpayPaymentId = $_POST['razorpayPaymentId'] ?? null;
 $razorpaySignature = trim($_POST['razorpaySignature'] ?? '');
 $userId = intval($_POST['userId'] ?? 0);
 $planId = $_POST['planId'] ?? ''; 
+Log::info('******************* Verify-Payment-signature ************************');
+Log::info('Incoming Razorpay verify-payment-signature call', ['POST' => $_POST]);
 
 if (!$razorpayPaymentId || !$razorpaySignature || !$userId || !$planId) {
+    Log::warning('Missing required fields', compact('razorpayPaymentId', 'razorpaySignature', 'userId', 'planId'));
     echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
     exit;
 }
@@ -21,6 +30,7 @@ $dbname = "alphastudioz_ott";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
+    Log::error('DB connection failed', ['error' => $conn->connect_error]);
     echo json_encode(['status' => 'error', 'message' => 'Database connection failed: ' . $conn->connect_error]);
     exit;
 }
@@ -32,6 +42,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
+    Log::warning('Subscription not found for user', ['userId' => $userId]);
     echo json_encode(['status' => 'error', 'message' => 'User not found or no subscription found']);
     $stmt->close();
     $conn->close();
@@ -48,8 +59,18 @@ $key_secret = 'Yb1YK9cc9wPvNErVMQSYYWDX';
 // Verify signature
 $body = $razorpayPaymentId . '|' . $order_id;
 $expectedSignature = hash_hmac('sha256', $body, $key_secret);
-
+Log::info('Verifying signature', [
+    'body' => $razorpayPaymentId . '|' . $order_id,
+    'expected' => $expectedSignature,
+    'received' => $razorpaySignature,
+    'match' => $expectedSignature === $razorpaySignature
+]);
 if ($expectedSignature !== $razorpaySignature) {
+    Log::error('Signature mismatch', [
+        'expected' => $expectedSignature,
+        'received' => $razorpaySignature,
+        'userId' => $userId
+    ]);
     $updateStmt = $conn->prepare("UPDATE users SET subscription = 'Failed' WHERE id = ?");
     $updateStmt->bind_param("i", $userId);
     $updateStmt->execute();
@@ -72,6 +93,7 @@ $packageStmt->execute();
 $packageResult = $packageStmt->get_result();
 
 if ($packageResult->num_rows === 0) {
+    Log::warning('No matching package found', ['planId' => $planId]);
     echo json_encode(['status' => 'error', 'message' => 'Package not found for the given plan ID.']);
     $packageStmt->close();
     $conn->close();
@@ -95,7 +117,11 @@ $stmtExpiry->close();
 
 // Calculate new expiry date
 $newExpiryDate = date('Y-m-d', strtotime("+$duration months", strtotime($currentExpiryDate)));
-
+Log::info('Calculated new expiry date', [
+    'currentExpiry' => $currentExpiryDate,
+    'durationMonths' => $duration,
+    'newExpiryDate' => $newExpiryDate
+]);
 // Update users table
 $updateStmt = $conn->prepare("UPDATE users SET subscription = 'Yes', subscription_end_date = ?, razorpay_signature_id =? WHERE id = ?");
 $updateStmt->bind_param("si", $newExpiryDate,$order_id, $userId);
@@ -105,14 +131,26 @@ if ($updateStmt->execute()) {
     $tStatus = 1;
     $insertStmt = $conn->prepare("INSERT INTO `transaction` (user_id, package_id, amount, payment_id, expiry_date, status) VALUES (?, ?, ?, ?, ?, ?)");
     $insertStmt->bind_param("iisssi", $userId, $package_id, $amount, $razorpayPaymentId, $newExpiryDate, $tStatus);
-    $pending_status = 0;
-    $insertStmt = $conn->prepare("UPDATE users_subscriptions SET status = 1 WHERE id = ? AND razorpay_signature_id = ? AND status = ?");
-    $insertStmt->bind_param("is", $userId,  $order_id,$pending_status);
+
+    $insertStmt = $conn->prepare("UPDATE users_subscriptions SET status = 1 WHERE id = ? AND razorpay_signature_id = ?");
+    $insertStmt->bind_param("is", $userId,  $order_id);
     
-    
+    Log::info('Subscription updated in users table', [
+        'userId' => $userId,
+        'expiry' => $newExpiryDate
+    ]);
     if ($insertStmt->execute()) {
+        Log::info('Transaction inserted successfully', [
+            'userId' => $userId,
+            'package_id' => $package_id,
+            'amount' => $amount,
+            'payment_id' => $razorpayPaymentId,
+            'expiry_date' => $newExpiryDate
+        ]);
+         // Return success response
         echo json_encode(["status" => "success", "message" => "Subscription updated", "expiry_date" => $newExpiryDate]);
     } else {
+        Log::error('Transaction update failed', ['error' => $insertStmt->error]);
         echo json_encode(["status" => "error", "message" => "Transaction insert failed", "error" => $insertStmt->error]);
     }
     $insertStmt->close();
@@ -122,4 +160,5 @@ if ($updateStmt->execute()) {
 $updateStmt->close();
 
 $conn->close();
+Log::info('******************* Verify-Payment-signature End ************************');
 ?>

@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | About Us
+    {{ config('app.project_name') }} | About Us
 @endsection
 @section('main-section')
     <style>
@@ -77,24 +77,23 @@
             <div class="home-newdes-section-container">
                 <div class="container">
                     <span class="heading-text">About Us</span>
-                    <p>Alphaneon Studioz is an OTT platform where we stream Movies, Web Series, TV Shows, Music,
-                                Short Films, Trailers. Alphaneon Studioz is an entertainment platform where we are offering
-                                a wide range of content. Alphaneon Studioz provides you the best video streaming experience.
+                    <p>{{ config('app.project_full_name') }} is an OTT platform where we stream Movies, Web Series, TV Shows, Music,
+                                Short Films, Trailers. {{ config('app.project_full_name') }} is an entertainment platform where we are offering
+                                a wide range of content. {{ config('app.project_full_name') }} provides you the best video streaming experience.
                             </p>
                     <p>Enjoy all your favourite episodes of serials, movies, web series, interesting short clips and
                                 more on your Web browser! Enjoy and browse through Hindi, English, Tamil, Kannada, Marathi,
                                 Telugu, Bengali, Gujarati and Punjabi content. Also soon we are coming with our android and
                                 IOS Application.</p>
-                    <p>Alphaneon Studioz aims to revolutionize the way audiences consume entertainment. We pride
+                    <p>{{ config('app.project_full_name') }} aims to revolutionize the way audiences consume entertainment. We pride
                                 ourselves on offering a diverse range of content, including movies, web series, TV shows,
                                 music, short films, and trailers, catering to a wide array of tastes and preferences. Our
                                 platform provides a seamless and immersive viewing experience, allowing users to enjoy their
                                 favorite content anytime, anywhere. With a focus on quality and innovation, we strive to
-                                deliver engaging and memorable entertainment to our subscribers. Join us on Alphaneon
-                                Studioz and explore a world of limitless entertainment possibilities.</p>
+                                deliver engaging and memorable entertainment to our subscribers. Join us on {{ config('app.project_full_name') }} and explore a world of limitless entertainment possibilities.</p>
                     <hr class="mb-3">
                     <span class="heading-text">Overview</span>
-                    <p>Alphaneon Studioz Private Limited is a burgeoning media and entertainment company based in
+                    <p>{{ config('app.project_full_name') }} Private Limited is a burgeoning media and entertainment company based in
                                 Mumbai, India. Established in 2023, the company has quickly positioned itself as a dynamic
                                 player in the industry, focusing on innovative content creation and digital storytelling.
                             </p>
@@ -186,12 +185,12 @@
                     <hr class="mb-3">
                     <div class="contact-delails">
                         <div class="row">
-                            <div class="col-12 col-md-6 col-lg-4 mb-4">
+                            {{-- <div class="col-12 col-md-6 col-lg-4 mb-4">
                                 <div class="quick-contact">
                                     <div class="p-2 mt-3">
                                         <div class="row">
                                             <div class="col-2 border-end pe-4">
-                                                <img src="{{ url('/') }}/asset/icons/telephone.png" class="img-fluid" alt="">
+                                                <img src="{{ url('/') }}/asset/icons/telephone.png" class="img-fluid" alt="telephone.png">
                                             </div>
                                             <div class="col-10 d-flex align-items-center ps-4">
                                                 <div class="phone-contact">
@@ -202,18 +201,18 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="col-12 col-md-6 col-lg-4 mb-4">
                                 <div class="quick-contact">
                                     <div class="p-2 mt-3">
                                         <div class="row">
                                             <div class="col-2 border-end pe-4">
-                                                <img src="{{ url('/') }}/asset/icons/gmail.png" class="img-fluid" alt="">
+                                                <img src="{{ url('/') }}/asset/icons/gmail.png" class="img-fluid" alt="gmail.png">
                                             </div>
                                             <div class="col-10 d-flex align-items-center ps-4">
                                                 <div class="phone-contact">
                                                     <p class="mb-0"><strong>Email</strong></p>
-                                                    <p class="mt-1 mb-0"><a class="text-decoration-none text-white" href="mailto:info@alphastudioz.in">info@alphastudioz.in</a></p>
+                                                    <p class="mt-1 mb-0"><a class="text-decoration-none text-white" href="mailto:{{ 'info@' . strtolower(config('app.project_name')) . '.in' }}">{{ 'info@' . strtolower(config('app.project_name')) . '.in' }}</a></p>
                                                     <p class="mt-1 mb-0"><a class="text-decoration-none text-white" href="mailto:contact@alphaneonstudioz.in">contact@alphaneonstudioz.in</a></p>
                                                 </div>
                                             </div>
@@ -226,12 +225,12 @@
                                     <div class="p-2 mt-3">
                                         <div class="row">
                                             <div class="col-2 border-end pe-4">
-                                                <img src="{{ url('/') }}/asset/icons/web.png" class="img-fluid" alt="">
+                                                <img src="{{ url('/') }}/asset/icons/web.png" class="img-fluid" alt="web.png">
                                             </div>
                                             <div class="col-10 d-flex align-items-center ps-4">
                                                 <div class="phone-contact">
                                                     <p class="mb-0"><strong>Website</strong></p>
-                                                    <p class="mt-1 mb-0"><a class="text-decoration-none text-white" href="https://alphastudioz.in/">https://alphastudioz.in/</a></p>
+                                                    <p class="mt-1 mb-0"><a class="text-decoration-none text-white" href="{{ config('app.website_url') }}">{{ config('app.website_url') }}</a></p>
                                                 </div>
                                             </div>
                                         </div>

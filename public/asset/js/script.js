@@ -32,14 +32,10 @@ window.addEventListener('load', function () {
     });
 });
 // ------------------------------------------------------------------------------------------
-$(document).on('click',"#navbar-toggler",function (e) {
+$(document).on('click', "#navbar-toggler", function (e) {
     e.preventDefault();
-    $('#collapsibleNavId').toggle();
-    if ($('#collapsibleNavId').is(':visible')) {
-        $(".navbar").css('background',
-            'linear-gradient(to top, #000000 70%, rgba(255, 0, 0, 0))');
-    } else {
-        $(".navbar").css('background', ''); // remove the background
+    if (typeof openMobileDrawer === 'function') {
+        openMobileDrawer();
     }
 });
 
@@ -50,7 +46,7 @@ function hideAllCustomDropdowns() {
 }
 
 // 1. Handle clicks on dropdown triggers to toggle visibility
-$(document).on('click','.nav-item.dropdown > .nav-link',function (event) {
+$(document).on('click', '.nav-item.dropdown > .nav-link', function (event) {
     event.preventDefault(); // Prevent default link behavior
     event
         .stopPropagation(); // Stop propagation to prevent document click from closing immediately
@@ -66,30 +62,13 @@ $(document).on('click','.nav-item.dropdown > .nav-link',function (event) {
 
 
 // 2. Handle close button clicks within dropdowns
-$(document).on('click', '.close-dropdown, .profile-close-dropdown, .notification-close-dropdown',function (
+$(document).on('click', '.close-dropdown, .profile-close-dropdown, .notification-close-dropdown', function (
     event) {
     event
         .stopPropagation(); // Prevent click from bubbling up and re-opening/closing other dropdowns
     $(this).closest('.custom-dropdown-menu').hide();
 });
 
-
-// 3. Close dropdown when clicking anywhere outside a custom-dropdown-menu or its trigger
-// $(document).on('click', function (event) {
-//     // Check if the click occurred outside any custom dropdown menu
-//     // and also outside any of the dropdown trigger links/buttons
-//     if (!$(event.target).closest('.custom-dropdown-menu').length &&
-//         !$(event.target).closest('.nav-item.dropdown > .nav-link').length) {
-//         const dropdown = document.querySelector('#dropdownId');
-//         const svg = dropdown.querySelector('svg');
-//         const box3 = svg.querySelector('#box3');
-//         const box4 = svg.querySelector('#box4');
-//         svg.style.transform = 'rotate(0deg)';
-//         box3.style.fill = 'white'; // Reset to original or use original color
-//         box4.style.fill = 'white';
-//         hideAllCustomDropdowns();
-//     }
-// });
 // --- Existing Owl Carousel Initialization ---
 $(".owl-carousel .owl-nav").removeClass('disabled');
 $(".owl-carousel").each(function () {
@@ -184,24 +163,6 @@ function addActiveClasses(event) {
 }
 // ------------------------------------------------------------------------------------------
 $(document).ready(function () {
-
-    //  "#latestReleaseSlider",
-    //     "#podcastslider",
-    //     "#upcomings",
-    //     "#trailers",
-    //     "#shortfilmslider",
-    //     "#webseriesslider",
-    //     "#musicsslider",
-    //     "#movieslider",
-    //     "#moviesliderhome"
-    // $("#shortfilmslider").hover(function () {
-    //     $(this).find(".owl-nav.disabled").css("display", "block");
-    // });
-    // $("#podcastslider").hover(function () {
-    //     $(this).find(".owl-nav.disabled").css("display", "block");
-    // });
-
-
     let otheritemsToShow = 6;
     if (window.innerWidth >= 3000) {
         otheritemsToShow = 12;
@@ -221,27 +182,6 @@ $(document).ready(function () {
     };
 
     const standardResponsive = {
-        // 0: { items: 1 },
-        // 576: { items: 2 },
-        // 768: { items: 2 },
-        // 992: { items: 3 },
-        // 1200: { items: 4 }
-
-        // 0:  { items: 2, stagePadding: 0, margin: 10 },
-        // 320: {items: 1, stagePadding: 0, margin: 10 },
-        // 425: {items: 2, stagePadding: 0, margin: 10},
-        // 576: { items: 2 , stagePadding: 0, margin: 10},
-        // 768: { items: 2 , stagePadding: 0, margin: 10},
-        // 992: { items: 5 , stagePadding: 0, margin: 10},
-        // 1200: { items: 5 , stagePadding: 0, margin: 10},
-        // 1800: { items: 6 , stagePadding: 0, margin: 10},
-        // 0: { items: 3, stagePadding: 0, margin: 10 },
-        // 600: { items: 4 },
-        // 992: { items: 5 },
-        // 1200: { items: 5 },
-        // 1400: { items: 7 },
-        // 1800: { items: 9 },
-        // 3000: { items: 12 }
 
         0: { items: 2, stagePadding: 0, margin: 10 },
         320: { items: 1, stagePadding: 0, margin: 10 },
@@ -273,6 +213,7 @@ $(document).ready(function () {
         "#musicsslider",
         "#movieslider",
         "#moviesliderhome",
+        "#continueWatchingSlider", "#watchLaterSlider", "#top10MoviesSlider", "#top10TrailersSlider", "#top10ShortfilmsSlider", "#top10PodcastsSlider"
     ];
 
     // Apply common owlCarousel setup to all the above sliders
@@ -306,79 +247,8 @@ $(document).ready(function () {
         }
     });
 
-    // Banner Sync (new-banner & sync2)
-    var sync1 = $("#new-banner");
-    var sync2 = $("#sync2");
-    var slidesPerPage = 4;
 
-    var syncedSecondary = true;
-    sync1.owlCarousel({
-        items: 1,
-        slideSpeed: 4000,
-        nav: false,
-        autoplay: true,
-        dots: false,
-        loop: true,
-        animateOut: 'fadeOut',
-        responsiveRefreshRate: 200,
-    }).on('changed.owl.carousel', function (event) {
-        syncPosition(event);
-        applyAnimation(event);
-    });
 
-    sync2
-        .on('initialized.owl.carousel', function () {
-            sync2.find(".owl-item").eq(0).addClass("current");
-        })
-        .owlCarousel({
-            items: slidesPerPage,
-            dots: false,
-            nav: true,
-            smartSpeed: 200,
-            slideSpeed: 500,
-            slideBy: slidesPerPage,
-            stagePadding: 20,
-            responsiveRefreshRate: 100,
-            navText: [
-                '<svg>...left arrow svg...</svg>',
-                '<svg>...right arrow svg...</svg>'
-            ]
-        }).on('changed.owl.carousel', syncPosition2);
-
-    function syncPosition(el) {
-        var count = el.item.count - 1;
-        var current = Math.round(el.item.index - el.item.count / 2 - 0.5);
-        if (current < 0) current = count;
-        if (current > count) current = 0;
-        sync2.find(".owl-item").removeClass("current").eq(current).addClass("current");
-        var onscreen = sync2.find('.owl-item.active').length - 1;
-        var start = sync2.find('.owl-item.active').first().index();
-        var end = sync2.find('.owl-item.active').last().index();
-        if (current > end) {
-            sync2.data('owl.carousel').to(current, 100, true);
-        }
-        if (current < start) {
-            sync2.data('owl.carousel').to(current - onscreen, 100, true);
-        }
-    }
-
-    function syncPosition2(el) {
-        if (syncedSecondary) {
-            var number = el.item.index;
-            sync1.data('owl.carousel').to(number, 100, true);
-        }
-    }
-
-    sync2.on("click", ".owl-item", function (e) {
-        e.preventDefault();
-        var number = $(this).index();
-        sync1.data('owl.carousel').to(number, 300, true);
-    });
-
-    function applyAnimation(event) {
-        $(".owl-item").find(".animate__animated").removeClass("animate__fadeInUp");
-        $(".owl-item").eq(event.item.index).find(".animate__animated").addClass("animate__fadeInUp");
-    }
 
     // Categories Carousel
     $("#categories").owlCarousel({
@@ -441,7 +311,83 @@ $(document).ready(function () {
         }
     });
 });
+$(document).ready(function () {
+    var sync1 = $("#new-banner");
+    var sync2 = $("#sync2");
+    var slidesPerPage = 4;
+    var isSyncing = false;
 
+    // Main banner
+    sync1.owlCarousel({
+        items: 1,
+        slideSpeed: 4000,
+        nav: false,
+        autoplay: true,
+        dots: false,
+        loop: true,
+        animateOut: 'fadeOut',
+        responsiveRefreshRate: 200,
+    }).on('changed.owl.carousel', function (event) {
+        if (isSyncing) return;
+        syncPosition(event);
+        applyAnimation(event);
+    });
+
+    // ✅ nav: false — no internal nav buttons, nothing to block clicks
+    sync2.owlCarousel({
+        items: slidesPerPage,
+        dots: false,
+        nav: false,
+        smartSpeed: 200,
+        slideSpeed: 4000,
+        slideBy: 1,
+        stagePadding: 0,
+        loop: false,
+        responsiveRefreshRate: 100,
+    }).on('initialized.owl.carousel', function () {
+        sync2.find(".owl-item").eq(0).addClass("current");
+    });
+
+    // ✅ Click on .thumbnail-holder — nothing can block this
+    $(document).on("click", "#sync2 .thumbnail-holder", function (e) {
+        var dataIndex = $(this).closest(".item").attr("data-index");
+
+        console.log("Clicked data-index:", dataIndex);
+
+        if (dataIndex === undefined || dataIndex === null) return;
+
+        sync2.find(".owl-item").removeClass("current");
+        $(this).closest(".owl-item").addClass("current");
+
+        isSyncing = true;
+        sync1.trigger('to.owl.carousel', [parseInt(dataIndex), 300, true]);
+        setTimeout(function () { isSyncing = false; }, 500);
+    });
+
+    // ✅ Custom external prev/next
+    $(document).on("click", ".sync2-custom-prev", function () {
+        sync2.trigger('prev.owl.carousel');
+    });
+
+    $(document).on("click", ".sync2-custom-next", function () {
+        sync2.trigger('next.owl.carousel');
+    });
+
+    function syncPosition(el) {
+        var count = el.item.count - 1;
+        var current = Math.round(el.item.index - el.item.count / 2 - 0.5);
+        if (current < 0) current = count;
+        if (current > count) current = 0;
+
+        sync2.find(".owl-item").removeClass("current").eq(current).addClass("current");
+        sync2.trigger('to.owl.carousel', [current, 100, true]);
+    }
+
+    function applyAnimation(event) {
+        sync1.find(".owl-item").find(".animate__animated").removeClass("animate__fadeInUp");
+        sync1.find(".owl-item").eq(event.item.index).find(".animate__animated").addClass("animate__fadeInUp");
+    }
+});
 document.addEventListener("DOMContentLoaded", function () {
     const watchNowButton = document.querySelector('.watch-now');
     const videoPlayer = document.getElementById('player');
@@ -467,26 +413,8 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-    // window.addEventListener('load', function() {
-    //     videoPlayer.load();
-    //   });
 });
-document.addEventListener("DOMContentLoaded", () => {
-    const player = new Plyr('#player', {
-        defaultQuality: '360',
-    });
-    const storedTime = localStorage.getItem('videoPlaybackTime');
-    if (storedTime) {
-        player.currentTime = parseFloat(storedTime);
-    }
-    // Listen for timeupdate event to track video progress
-    player.on('timeupdate', () => {
-        // Store current playback time in local storage
-        localStorage.setItem('videoPlaybackTime', player.currentTime);
-        const watchNowButton = document.querySelector('.watch-now');
-        watchNowButton.innerHTML = '<i class="icon-play"></i>Continue Watching';
-    });
-});
+
 $(document).ready(function () {
     // Toggle sidebar open/close
     $(".sidebar-open").click(function () {
@@ -500,7 +428,8 @@ $(document).ready(function () {
     //         $(".sidebar-container").css("left", "-250px");
     //     }
     // });
-})
+});
+
 $(document).ready(function () {
     let timeout;
     // Function to check if the mouse is within the first 150px of the sidebar
@@ -557,7 +486,6 @@ $(document).ready(function () {
     );
 });
 
-
 $(document).ready(function () {
     $('#searchInput').keyup(function () {
         var keyword = $(this).val();
@@ -588,7 +516,7 @@ $(document).ready(function () {
             html += '<a href="' + getURL(result) + '">';
             html += '<div class="row">';
             // html += '<div class="col-3">';
-            // html += '<img src="https://alphastudioz.in/admin_panel/public/images/video/'+ result.thumbnail + '" height="100px" width="auto">';
+            // html += '<img src="' + window.WEBSITE_URL + 'admin_panel/public/images/video/'+ result.thumbnail + '" height="100px" width="auto">';
             // html += '</div>';
             html += '<div class="col-9">';
             html += '<h3>' + result.name + '</h3>';
@@ -611,10 +539,10 @@ $(document).ready(function () {
         return text; // If text has fewer than 100 words, return it as is
     }
     function getURL(result) {
-        console.log('Generating URL for result:', result);
-        var id = '{{App\Helpers\VideoHelper::encryptID(' + result.id + ')}}';
-        var type = result.type_id;
         var url = '';
+        var type = result.type_id;
+        var id = result.id;
+
         switch (type) {
             case 6:
                 url = '/view/details/' + id;
@@ -632,10 +560,12 @@ $(document).ready(function () {
                 url = '/view/details/' + id;
                 break;
             default:
+                url = '/view/details/' + id;
                 break;
         }
         return url;
     }
+
     $(document).ready(function () {
         // Click event handler for package radio buttons
         $(".packageData").click(function () {
@@ -648,6 +578,7 @@ $(document).ready(function () {
         $(".packageData:checked").trigger('click');
     });
 });
+
 // const button = document.querySelector(".show-notification"),
 //       toasts = document.querySelectorAll(".toasts"), // select all .toasts elements
 //       closeIcons = document.querySelectorAll(".close"),
@@ -690,209 +621,29 @@ if (closeIcons) {
         });
     });
 }
-// Initialize Plyr with the configuration
-const player = new Plyr('#webseriesplayer', {
-    controls: [
-        'play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions',
-        'settings', 'pip', 'airplay', 'fullscreen'
-    ],
-    // Other configuration options...
-});
-// Find the Plyr controls container to inject the button into it
-player.on('ready', () => {
-    // Create the Skip Intro button
-    const skipIntroBtn = document.createElement('button');
-    skipIntroBtn.classList.add('plyr__skip-intro-btn'); // Custom class for styling
-    skipIntroBtn.setAttribute('type', 'button');
-    skipIntroBtn.setAttribute('aria-label', 'Skip Intro');
-    skipIntroBtn.innerHTML = 'Skip Intro'; // Button label
-    // Initially hidden
-    skipIntroBtn.style.display = 'none';
-    // Add the button into the controls container
-    const controlsContainer = player.elements.controls;
-    controlsContainer.appendChild(skipIntroBtn);
-    const countdown = document.createElement('p');
-    countdown.classList.add('plyr__control', 'plyr__countdown-text'); // Plyr button style + custom class
-    countdown.setAttribute('id', 'countdown');
-    countdown.innerHTML = 'Next episode will play in'; // Button label
-    countdown.style.display = 'none';// Initially hidden
-    // Create Previous Episode button if it exists
-    if (typeof previousEpisodeUrl !== 'undefined') {
-        const prevEpisodeBtn = document.createElement('button');
-        prevEpisodeBtn.classList.add('plyr__control', 'plyr__prev-episode-btn');
-        prevEpisodeBtn.setAttribute('type', 'button');
-        prevEpisodeBtn.setAttribute('id', 'prevEpisodeBtn');
-        prevEpisodeBtn.setAttribute('aria-label', 'Previous Episode');
-        prevEpisodeBtn.innerHTML = 'Previous Episode';
-        prevEpisodeBtn.style.display = 'block';
-        // Add event listener for Previous Episode button
-        prevEpisodeBtn.addEventListener('click', () => {
-            playEpisode(previousEpisodeUrl); // Call the function to play the previous episode
-        });
-        // Append the Previous Episode button to the div block
-        controlsContainer.appendChild(prevEpisodeBtn);
-    }
-    // Create Next Episode button if it exists
-    if (typeof nextEpisodeUrl !== 'undefined') {
-        const nextEpisodeBtn = document.createElement('button');
-        nextEpisodeBtn.classList.add('plyr__control', 'plyr__next-episode-btn');
-        nextEpisodeBtn.setAttribute('type', 'button');
-        nextEpisodeBtn.setAttribute('id', 'nextEpisodeBtn');
-        nextEpisodeBtn.setAttribute('aria-label', 'Next Episode');
-        nextEpisodeBtn.innerHTML = 'Next Episode';
-        // Add event listener for Next Episode button
-        nextEpisodeBtn.addEventListener('click', () => {
-            playEpisode(nextEpisodeUrl); // Call the function to play the next episode
-        });
-        // Append the Next Episode button to the div block
-        controlsContainer.appendChild(nextEpisodeBtn);
-    }
-    else {
-    }
-    // // Logic to show or hide the button based on current video time
-    // const skipToTime = 390; // Time to skip to (e.g., 6 minutes 30 seconds)
-    // const buttonVisibleAfter = 330; // Show the button after 5 minutes 30 seconds
-    // const video = player.media;
-    // video.addEventListener('timeupdate', () => {
-    //     if (video.currentTime >= buttonVisibleAfter && video.currentTime < skipToTime) {
-    //         skipIntroBtn.style.display = 'block'; // Show button
-    //     } else {
-    //         skipIntroBtn.style.display = 'none'; // Hide button after skipToTime
-    //     }
-    // });
-    // // Event listener for the "Skip Intro" button click
-    // skipIntroBtn.addEventListener('click', () => {
-    //     video.currentTime = skipToTime; // Skip to the defined time
-    //     player.play(); // Continue playing
-    //     skipIntroBtn.style.display = 'none'; // Hide the button after skipping
-    // });
-    const videoPlayer = player.media
-    // Automatically navigate to the next episode 10 seconds before the video ends
-    videoPlayer.addEventListener('timeupdate', function () {
-        const timeRemaining = videoPlayer.duration - videoPlayer.currentTime;
-        if (timeRemaining <= 80) {
-            const controlsContent = player.elements.container;
-            if (typeof nextEpisodeUrl !== 'undefined') {
-                controlsContent.appendChild(nextEpisodeBtn);
-                nextEpisodeBtn.classList.add('plyr__next-episode-btn', 'active');
-            }
-            if (typeof previousEpisodeUrl !== 'undefined') {
-                controlsContent.appendChild(prevEpisodeBtn);
-                prevEpisodeBtn.classList.add('plyr__prev-episode-btn', 'active');
-            }
-        }
-        if (timeRemaining < 10 && nextEpisodeBtn) {
-            const controlsContent = player.elements.container;
-            controlsContent.appendChild(countdown);
-            countdown.style.display = 'block';
-            countdown.innerText = `Next episode will play in ${Math.floor(timeRemaining)} seconds`;
-            // After 10 seconds, auto-play the next episode
-            if (timeRemaining <= 0) {
-                playEpisode(nextEpisodeUrl);
-                videoPlayer.play();
-            }
-        }
-        else {
-            countdown.style.display = 'none';
-        }
-    });
-});
+
 function playEpisode(nextUrl) {
     window.location.href = nextUrl;
 }
-// const player = new Plyr('#webseriesplayer', {
-//     controls: [
-//         'play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions',
-//         'settings', 'pip', 'airplay', 'fullscreen'
-//     ],
-//     // Other configuration options...
-// });
-// // Wait until the Plyr player is ready
-// player.on('ready', () => {
-//     // Get video and control container
-//     const video = player.media;
-//     const controlsContainer = player.elements.container;
-//     // Create the Skip Intro button
-//     const skipIntroBtn = document.createElement('button');
-//     skipIntroBtn.classList.add('plyr__control', 'plyr__skip-intro-btn'); // Plyr button style + custom class
-//     skipIntroBtn.setAttribute('type', 'button');
-//     skipIntroBtn.setAttribute('aria-label', 'Skip Intro');
-//     skipIntroBtn.innerHTML = 'Skip Intro'; // Button label
-//     skipIntroBtn.style.display = 'none'; // Initially hidden
-//     // Append the Skip Intro button to the Plyr controls
-//     controlsContainer.appendChild(skipIntroBtn);
-//     // Skip Intro Logic (show button after 5:30 and skip to 6:30)
-//     const skipToTime = 390; // Skip to 6:30 (390 seconds)
-//     const buttonVisibleAfter = 330; // Show button after 5:30 (330 seconds)
-//     video.addEventListener('timeupdate', () => {
-//         if (video.currentTime >= buttonVisibleAfter && video.currentTime < skipToTime) {
-//             skipIntroBtn.style.display = 'block'; // Show Skip Intro button
-//         } else {
-//             skipIntroBtn.style.display = 'none'; // Hide button after skip time
-//         }
-//     });
-//     // Event listener for "Skip Intro" button click
-//     skipIntroBtn.addEventListener('click', () => {
-//         video.currentTime = skipToTime; // Skip to the desired time
-//         player.play(); // Continue playing
-//         skipIntroBtn.style.display = 'none'; // Hide the button
-//     });
-//     // Create the Next Episode button
-//     const nextEpisodeBtn = document.createElement('button');
-//     nextEpisodeBtn.classList.add('plyr__control', 'plyr__next-episode-btn'); // Plyr button style + custom class
-//     nextEpisodeBtn.setAttribute('type', 'button');
-//     nextEpisodeBtn.setAttribute('aria-label', 'Next Episode');
-//     nextEpisodeBtn.innerHTML = 'Next Episode'; // Button label
-//     nextEpisodeBtn.style.display = 'none'; // Initially hidden
-//     // Append the Next Episode button to the Plyr controls
-//     controlsContainer.appendChild(nextEpisodeBtn);
-//     // Check if the video is near the end and display Next Episode button
-//     video.addEventListener('timeupdate', () => {
-//         const timeRemaining = video.duration - video.currentTime;
-//         if (timeRemaining <= 60) {
-//             nextEpisodeBtn.style.display = 'block'; // Show Next Episode button 10 seconds before end
-//         } else {
-//             nextEpisodeBtn.style.display = 'none'; // Hide button until 10 seconds before end
-//         }
-//     });
-//     // Event listener for "Next Episode" button click
-//     nextEpisodeBtn.addEventListener('click', () => {
-//         const nextEpisodeUrl = nextEpisodeBtn.getAttribute('data-next-url');
-//         if (nextEpisodeUrl) {
-//             window.location.href = nextEpisodeUrl; // Navigate to the next episode
-//         }
-//     });
-//     // Add the next episode URL dynamically (make sure to pass the next episode URL in the blade template)
-//     const nextEpisodeUrl = '{{ route("webseries.episodes.view", ["seriesname" => $series->name, "season" => $nextEpisode->season_id, "name" => $nextEpisode->name, "id" => $nextEpisode->id, "episode" => $nextEpisode->episode_no]) }}';
-//     nextEpisodeBtn.setAttribute('data-next-url', nextEpisodeUrl);
-// });
 document.addEventListener('DOMContentLoaded', function () {
-    // Check if the subscription status is active and daysLeft is defined
-    var subscriptionStatus = '';
-    var daysLeft = null;
-    if (subscriptionStatus === 'No' || typeof daysLeft !== 'undefined' && daysLeft !== null) {
+    // Check if subscription data exists from Blade
+    var subscriptionStatus = window.subscriptionStatus || '';
+    var daysLeft = window.daysLeft || null;
+
+    if (subscriptionStatus === 'No' || (daysLeft !== null && daysLeft !== undefined)) {
         let message = '';
         if (daysLeft <= 0) {
             message = "Your subscription has expired. Renew now to continue enjoying the service.";
-        }
-        if (message) {
-            // document.getElementById('notification-message').innerText = message;
-            // var myModal = new bootstrap.Modal(document.getElementById('notification-modal'));
-            // myModal.show();
-        }
-    }
-    else {
-        let message = '';
-        if (daysLeft > 0 && daysLeft <= 2) {
+        } else if (daysLeft > 0 && daysLeft <= 2) {
             message = "Your subscription will expire in " + daysLeft + " day(s). Renew now to continue enjoying the service.";
         }
         if (message) {
-            // document.getElementById('notification-message').innerText = message;
-            // var myModal = new bootstrap.Modal(document.getElementById('notification-modal'));
-            // myModal.show();
+            // Show notification logic here if needed
+            console.log('Subscription notification:', message);
         }
     }
 });
+
 document.addEventListener('DOMContentLoaded', function () {
     const descriptionDiv = document.getElementById('description');
     const toggleButton = document.getElementById('toggleDescription');
@@ -903,12 +654,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
 document.addEventListener('DOMContentLoaded', function () {
     const loader = document.getElementById('page-loader');
-    loader.style.display = 'flex';
+    if (loader) {
+        loader.style.display = 'none';
+    }
+
+    const allSkeleton = document.querySelectorAll('.skeleton');
+    allSkeleton.forEach(item => {
+        item.classList.remove('skeleton');
+    });
+
+    // Remove all console.log statements for production
+    // The following lines were removed: console.warn, console.error, etc.
 });
-
-
 
 //DRM Management
 // document.addEventListener('contextmenu', event => event.preventDefault());
@@ -926,6 +686,7 @@ document.addEventListener('DOMContentLoaded', function () {
 //         alert('Printing is disabled!');
 //     }
 // });
+
 // document.addEventListener("contextmenu", e => e.preventDefault());
 // document.addEventListener("keydown", e => {
 //     if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
@@ -938,8 +699,6 @@ document.addEventListener('DOMContentLoaded', function () {
 //         console.warn('User switched tabs or minimized, potentially for screen recording.');
 //     }
 // });
-
-
 // Hover on image
 document.addEventListener('DOMContentLoaded', function () {
     // Select all image wrappers (which contain the <a> and <img> tags)
@@ -961,10 +720,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 alphaCard.classList.add('has-hovered-large'); // Add a class to the parent for additional styling if needed (e.g., hiding skeleton)
 
                 // Play video if available
-                const video = alphaCardLarge.querySelector('.video-holder');
-                if (video && video.paused) {
-                    video.play().catch(e => console.error("Video play failed:", e)); // Add error handling for play()
-                }
+                // const video = alphaCardLarge.querySelector('.video-holder');
+                // if (video && video.paused) {
+                //     video.play().catch(e => console.error("Video play failed:", e)); // Add error handling for play()
+                // }
             });
 
             // When mouse leaves the thumbnail image

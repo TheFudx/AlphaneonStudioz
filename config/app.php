@@ -130,6 +130,7 @@ return [
     */
     'razorpay_key' => env('RAZORPAY_KEY'),
     'razorpay_secret' => env('RAZORPAY_SECRET'),
+    'razorpay_webhook_secret' => env('RAZORPAY_WEBHOOK_SECRET'),
     'providers' => [
         /*
          * Laravel Framework Service Providers...
@@ -157,7 +158,6 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         App\Providers\HelperServiceProvider::class,
-        Barryvdh\Debugbar\ServiceProvider::class,
         /*
          * Package Service Providers...
          */
@@ -185,7 +185,15 @@ return [
     */
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
-        'Debugbar' => Barryvdh\Debugbar\Facade::class,
         'VideoThumbnail' => Pawlox\VideoThumbnail\Facade\VideoThumbnail::class
     ])->toArray(),
+
+    'ios_app_url' => env('IOS_APP_URL', 'https://apps.apple.com/us/app/alphaneon-studioz/id6723896639'),
+    'android_app_url' => env('ANDROID_APP_URL', 'https://play.google.com/store/apps/details?id=com.alphastudioz.alphaneonstudioz'),
+    'website_url' => env('WEBSITE_URL', 'https://alphastudioz.in/'),
+    'project_name' => env('PROJECT_NAME', 'Alphastudioz'),
+    'project_full_name' => env('PROJECT_FULL_NAME', 'Alphaneon Studioz'),
+    'ios_deep_link' => env('IOS_DEEP_LINK', 'alphastudioz://'),
+    'android_deep_link' => env('ANDROID_DEEP_LINK', 'alphastudioz://'),
+    'deep_link' => env('APP_DEEP_LINK', 'alphastudioz://open'),
 ];

@@ -5,25 +5,31 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "php": "^8.1",
+        "php": "^8.1|^8.5",
         "barryvdh/laravel-dompdf": "^3.0",
-        "guzzlehttp/guzzle": "^7.2",
+        "firebase/php-jwt": "^7.0",
+        "google/auth": "^1.47",
+        "google/cloud-vision": "^2.0",
+        "guzzlehttp/guzzle": "^7.9",
         "hisorange/browser-detect": "^5.0",
         "laravel/framework": "^10.0",
-        "laravel/sanctum": "^3.2",
-        "laravel/socialite": "^5.12",
+        "laravel/sanctum": "^3.3",
+        "laravel/socialite": "^5.21",
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.5",
+        "mobiledetect/mobiledetectlib": "^4.9",
         "pawlox/video-thumbnail": "^5.2",
         "phpmailer/phpmailer": "^6.9",
+        "rap2hpoutre/laravel-log-viewer": "^2.5",
         "razorpay/razorpay": "^2.9",
+        "simplesoftwareio/simple-qrcode": "^4.2",
+        "socialiteproviders/apple": "^5.7",
         "twilio/sdk": "^8.0",
         "vinkla/hashids": "^11.0",
         "vlucas/phpdotenv": "^5.6",
         "whichbrowser/parser": "^2.1"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.15",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
@@ -40,7 +46,10 @@
         },
         "files": [
             "app/Helpers/Helpers.php",
-            "app/Helpers/VideoHelper.php"
+            "app/Helpers/VideoHelper.php",
+            "app/Helpers/FirebaseV1Notification.php",
+            "app/Helpers/SeoHelper.php"
+
         ]
     },
     "autoload-dev": {
@@ -77,6 +86,16 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true
+        },
+        "audit": {
+            "ignore": [
+                "PKSA-y2cr-5h3j-g3ys",
+                "PKSA-m5cs-t1y6-qpcs",
+                "PKSA-3r5d-mb8f-1qw9",
+                "PKSA-mdq4-51ck-6kdq",
+                "PKSA-8qx3-n5y5-vvnd",
+                "PKSA-w7xr-vk7n-rstm"
+            ]
         }
     },
     

@@ -61,7 +61,7 @@ language l ON v.language_id = l.id
 LEFT JOIN 
 category cat ON v.category_id = cat.id
 WHERE 
-v.type_id = 6
+v.type_id = 6 AND v.status = 1
 GROUP BY 
 v.name, 
 v.thumbnail_url, 

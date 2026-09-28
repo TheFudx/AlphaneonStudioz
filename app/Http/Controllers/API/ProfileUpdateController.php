@@ -3,27 +3,29 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Transction;
 use Razorpay\Api\Api;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
 class ProfileUpdateController extends Controller
 {
     public function deleteUserAccount(Request $request)
-    {
+    {   
+        $user = $request->user();
         // Manual check instead of automatic validation
-        if (!$request->has('user_id') || empty($request->user_id)) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'User ID is required.'
-            ], 200);
-        }
+        // if (!$request->has('user_id') || empty($request->user_id)) {
+        //     return response()->json([
+        //         'status' => 'failed',
+        //         'message' => 'User ID is required.'
+        //     ], 200);
+        // }
     
-        $user = User::find($request->user_id);
-    
+        // $user = User::find($request->user_id);
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'User ID not found in system.'
+                'message' => 'User not found.'
             ], 200);
         }
     
@@ -37,24 +39,21 @@ class ProfileUpdateController extends Controller
                 if ($subscription) {
                     $subscription->cancel(['cancel_at_cycle_end' => false]);
     
-                    DB::table('users')
-                        ->where('id', $user->id)
+                    User::where('id', $user->id)
                         ->update([
                             'subscription' => 'No',
                             'razorpay_subscription_id' => null,
                             'subscription_end_date' => now(),
                         ]);
     
-                    DB::table('transaction')
-                        ->where('user_id', $user->id)
+                    Transction::where('user_id', $user->id)
                         ->where('status', 1)
                         ->update([
                             'status' => 0,
                             'expiry_date' => now(),
                         ]);
     
-                    DB::table('user_subscriptions')
-                        ->where('user_id', $user->id)
+                    UserSubscription::where('user_id', $user->id)
                         ->delete();
                 }
             }

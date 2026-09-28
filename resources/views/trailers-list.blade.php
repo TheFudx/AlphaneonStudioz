@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    Alphastudioz | Trailers and Upcomings
+    {{ config('app.project_name') }} | Trailers and Upcomings
 @endsection
 <style>
     .owl-carousel .owl-nav.disabled {
@@ -21,20 +21,31 @@
                     <span class="l-head">Trailers & Upcomings </span>
                     <div class="category mt-md-3 mt-3">
                         <div class="category-carousel">
+                            <form id="filterForm" method="GET">
                             <div id="categories" class="owl-carousel owl-theme" data-skip-carousel="true">
                                 <div class="item ">
                                     <input type="radio" name="category" value="All" id="cat0" class="d-none"
                                         checked>
                                     <label for="cat0">All</label>
                                 </div>
-                                @foreach ($catlist as $item)
+                              
+                               
+                                {{-- @foreach ($catlist as $item)
                                     <div class="item">
                                         <input type="radio" name="category" value="{{ $item->cat_id }}" class="d-none"
                                             id="cat{{ $item->cat_id }}">
                                         <label for="cat{{ $item->cat_id }}">{{ $item->category_name }}</label>
                                     </div>
+                                @endforeach --}}
+                                @foreach($trailer_list as $t)
+                                    <div class="item">
+                                        <input type="radio" name="category" value="{{ $t }}" class="d-none"
+                                            id="cat{{ $t }}" @if(request()->get('category') == $t) checked @endif>
+                                        <label for="cat{{ $t }}">{{ $t }}</label>
+                                    </div>
                                 @endforeach
                             </div>
+                            </form>
                         </div>
                     </div>
                     <hr class="mb-5">
@@ -44,35 +55,36 @@
                                 @foreach ($video as $key => $videoItem)
                                  {{-- <div class=""> --}}
                                     <div class="item movie-new-card col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3 col-xxl-2 ps-md-2 ps-sm-1 pe-sm-1 pe-md-2 mb-2 pe-1 ps-1"
-                                        data-category-id="{{ $videoItem->category_id }}" data-index="{{ $key }}">
+                                        data-category-id="{{ $videoItem->trailer_for }}" data-index="{{ $key }}">
                                         <div class="cards-container">
                                             <div class="alpha-card skeleton card-for-podcast">
                                                 <div class="image-wrapper">
-                                                     <a href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($videoItem->id)]) }}">
-                                                        <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $videoItem->landscape }}"
-                                                        alt="">
-                                                     </a>
-                                                </div>
-                                                <div class="alpha-card-large {{ $videoItem->trailer_url ? 'movie-card' : '' }}"
-                                                    id="movie-card">
-                                                    <img src="https://alphastudioz.in/admin_panel/public/images/video/{{ $videoItem->landscape }}"
-                                                        class="thumbnail" id="thumbnail" alt="">
-                                                    <video class="video-holder" loop muted id="video-holder">
+                                                     <a href="{{ route('view.details.slug', ['content' => 'trailers', 'slug' => $videoItem->slug]) }}">
+                                                         <img class="lazy" src="{{ !empty($videoItem->landscape) ? config('app.website_url') . 'admin_panel/public/images/video/' . $videoItem->landscape : asset('asset/images/thumbnail-1.png') }}"
+                                                         onerror="this.onerror=null;this.src='{{ asset('asset/images/thumbnail-1.png') }}';"
+                                                         alt="{{ $videoItem->landscape ?? 'Trailer' }}" loading="lazy">
+                                                      </a>
+                                                 </div>
+                                                 <div class="alpha-card-large {{ $videoItem->trailer_url ? 'movie-card' : '' }}"
+                                                     id="movie-card">
+                                                     <img src="{{ !empty($videoItem->landscape) ? config('app.website_url') . 'admin_panel/public/images/video/' . $videoItem->landscape : asset('asset/images/thumbnail-1.png') }}"
+                                                         onerror="this.onerror=null;this.src='{{ asset('asset/images/thumbnail-1.png') }}';"
+                                                         class="thumbnail lazy" id="thumbnail" alt="{{ $videoItem->landscape ?? 'Trailer' }}" loading="lazy">
+                                                    {{-- <video class="video-holder" loop muted id="video-holder">
                                                         <source src="{{ $videoItem->trailer_url }}" type="video/mp4">
-                                                    </video>
+                                                    </video> --}}
                                                     <div class="content-holder pt-5">
-                                                        {{-- <img src="{{url('/')}}/asset/images/tere-sang.png" class="title mt-5" alt=""> --}}
                                                         <div class="content">
                                                             <div class="button-holder row">
                                                                 <div class="col-9">
                                                                     <a
-                                                                        href="{{ route('view.details', ['id' => App\Helpers\VideoHelper::encryptID($videoItem->id)]) }}">
+                                                                        href="{{ route('view.details.slug', ['content' => 'trailers', 'slug' => $videoItem->slug]) }}">
                                                                         <button class="btn-watchnow" type="button">
                                                                            <i class="fa-solid fa-play"></i>&nbsp;&nbsp;
                                                                             Watch Now</button></a>
                                                                 </div>
                                                                 <div class="col-3">
-                                                                    @include('watchlist-button', ['id' => $videoItem->id, 'type' => 'video', 'watchlist' => $watchlist])
+                                                                    @include('watchlist-button', ['id' => $videoItem->id, 'type_id' => $videoItem->type_id, 'category_id' => $videoItem->category_id, 'type' => 'video', 'watchlist' => $watchlist])
                                                                 </div>
                                                             </div>
                                                             <ul class="animate__animated animate__fadeInUp mt-3">
@@ -112,4 +124,11 @@
         </div>
     </section>
     <script src="{{URL::to('asset/js/gridView.js')}}"></script>
+    <script>
+        document.querySelectorAll("input[name='category']").forEach(el => {
+    el.addEventListener('change', () => {
+        document.getElementById('filterForm').submit();
+    });
+});
+    </script>
 @endsection

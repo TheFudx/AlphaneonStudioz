@@ -298,6 +298,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'middleware' => 'auth
     // Setting (Master)
     Route::get('setting', 'SettingController@index')->name('setting');
     Route::post('setting/app', 'SettingController@app')->name('settingapp');
+    Route::post('setting/appversion', 'SettingController@saveAppVersionSetting')->name('settingversion');
     Route::post('setting/currency', 'SettingController@currency')->name('settingcurrency');
     Route::post('setting/imdbkey', 'SettingController@saveImdbKey')->name('settingimdbkey');
     Route::post('setting/changepassword', 'SettingController@changepassword')->name('settingchangepassword');
